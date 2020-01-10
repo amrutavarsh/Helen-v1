@@ -21,30 +21,34 @@ struct ContentView: View {
                     Text("Only clear conversations").font(.subheadline)
                 }
                 Spacer()
-                Button(action:{}){
-                    Text("</>").fontWeight(.bold).padding(7)
-                    .foregroundColor(Color.white).background(Color.blue).cornerRadius(30)
+                Button(action:{}){Text("</>").fontWeight(.bold).padding(7).foregroundColor(Color.white).background(Color.blue).cornerRadius(30)
                 }
-            }.padding().offset(y:5)
+            }.padding(.horizontal)
             
             ZStack(alignment: .trailing){
-                camView.frame(height:550).offset(y:70).padding(.top, -70)
+                camView
                 
-                Button(action:{}){
-                    Text("Start/Stop").fontWeight(.bold).padding(7)
-                    .foregroundColor(Color.white).background(Color.blue).cornerRadius(10)
-                }.offset(x:-15,y:235)
-            
-                Button(action:{self.camView.callSwitchCam()}){
-                    Text("Flip cam").fontWeight(.bold).padding(7)
-                    .foregroundColor(Color.white).background(Color.black).cornerRadius(10)
-                }.offset(x:-15,y:185)
+                VStack(alignment: .trailing){
+                    Spacer()
+                    
+                    
+                    VStack(alignment: .trailing){
+                    Button(action:{self.camView.callSwitchCam()}){
+                        Text("Flip cam").fontWeight(.bold).padding(7)
+                        .foregroundColor(Color.white).background(Color.black).cornerRadius(10)
+                    }.padding(.vertical)
+                    
+                    Button(action:{}){
+                        Text("Start/Stop").fontWeight(.bold).padding(7)
+                        .foregroundColor(Color.white).background(Color.blue).cornerRadius(10)
+                    }
+                    }.padding(.horizontal)
                 
-            }.offset(y:-5)
+                    RoundedRectangle(cornerRadius:30).opacity(0.5).frame(height: 200)
+                }
+                
+            }.edgesIgnoringSafeArea(.bottom)
             
-            RoundedRectangle(cornerRadius:30).edgesIgnoringSafeArea(.bottom)
-                .frame(height: 200).offset(y:10)
-         
         }
     }
 }
