@@ -64,6 +64,12 @@ class CameraViewController : UIViewController {
         
         guard let captureDevice = AVCaptureDevice.default(for: .video) else { return }
         guard let input = try? AVCaptureDeviceInput(device : captureDevice) else { return }
+        //avoid creating multiple AV Inputs by destoying existing ones
+        if let inputs = avSession?.inputs as? [AVCaptureDeviceInput] {
+            for input in inputs {
+                avSession!.removeInput(input)
+            }
+        }
         avSession!.addInput(input)
         avSession!.startRunning()
         
