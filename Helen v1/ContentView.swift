@@ -7,10 +7,9 @@
 //
 
 import SwiftUI
-import UIKit
-import AVFoundation
 
 struct ContentView: View {
+    let camView = CameraView()
     var body: some View {
         VStack {
             HStack{
@@ -22,27 +21,29 @@ struct ContentView: View {
                     Text("Only clear conversations").font(.subheadline)
                 }
                 Spacer()
-            }.padding().offset(y:10)
+                Button(action:{}){
+                    Text("</>").fontWeight(.bold).padding(7)
+                    .foregroundColor(Color.white).background(Color.blue).cornerRadius(30)
+                }
+            }.padding().offset(y:5)
             
             ZStack(alignment: .trailing){
-            CameraView().frame(height:600).offset(y:70).padding(.top, -80)
-                
-                
+                camView.frame(height:550).offset(y:70).padding(.top, -70)
                 
                 Button(action:{}){
                     Text("Start/Stop").fontWeight(.bold).padding(7)
                     .foregroundColor(Color.white).background(Color.blue).cornerRadius(10)
                 }.offset(x:-15,y:235)
-                
-                Button(action:{}){
+            
+                Button(action:{self.camView.callSwitchCam()}){
                     Text("Flip cam").fontWeight(.bold).padding(7)
                     .foregroundColor(Color.white).background(Color.black).cornerRadius(10)
                 }.offset(x:-15,y:185)
                 
-            }
+            }.offset(y:-5)
             
             RoundedRectangle(cornerRadius:30).edgesIgnoringSafeArea(.bottom)
-            .frame(height: 250)
+                .frame(height: 200).offset(y:10)
          
         }
     }
@@ -53,37 +54,3 @@ struct ContentView_Previews: PreviewProvider {
         ContentView()
     }
 }
-
-struct CameraView : UIViewControllerRepresentable {
-    // Init ViewController
-    func makeUIViewController(context: UIViewControllerRepresentableContext<CameraView>) -> UIViewController {
-        let controller = CameraViewController()
-        return controller
-    }
-    
-    func updateUIViewController(_ uiViewController: CameraView.UIViewControllerType, context: UIViewControllerRepresentableContext<CameraView>) {
-        
-    }
-}
-
-class CameraViewController : UIViewController {
-    
-    override func viewDidLoad() {
-        super.viewDidLoad()
-        loadCamera()
-    }
-    
-    func loadCamera() {
-        let avSession = AVCaptureSession()
-        
-        guard let captureDevice = AVCaptureDevice.default(for: .video) else { return }
-        guard let input = try? AVCaptureDeviceInput(device : captureDevice) else { return }
-        avSession.addInput(input)
-        avSession.startRunning()
-        
-        let cameraPreview = AVCaptureVideoPreviewLayer(session: avSession)
-        view.layer.addSublayer(cameraPreview)
-        cameraPreview.frame = view.frame
-    }
-}
-
