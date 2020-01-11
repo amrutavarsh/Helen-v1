@@ -20,7 +20,7 @@ struct CreatorsInfo: View{
                     Image("amrut (1)").resizable().frame(width:100, height:100).cornerRadius(10).padding(.trailing)
                     
                     VStack(alignment: .leading){
-                        Text("Amrutavarsh S. Kinagi").foregroundColor(Color.white).font(.title).bold()
+                        Text("Amrutavarsh Kinagi").foregroundColor(Color.white).font(.title).bold()
                         
                         Text("askinagi@connect.ust.hk").foregroundColor(Color.white).font(.headline)
                     }

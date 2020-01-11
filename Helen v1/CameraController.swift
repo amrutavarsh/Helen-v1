@@ -15,15 +15,6 @@ public enum CameraPosition {
     case rear
 }
 
-enum CameraControllerError: Swift.Error {
-    case captureSessionAlreadyRunning
-    case captureSessionIsMissing
-    case inputsAreInvalid
-    case invalidOperation
-    case noCamerasAvailable
-    case unknown
-}
-
 struct CameraView : UIViewControllerRepresentable {
     // Init ViewController
     let controller = CameraViewController()
@@ -73,6 +64,7 @@ class CameraViewController : UIViewController, AVCaptureFileOutputRecordingDeleg
         avSession!.startRunning()
         
         let cameraPreview = AVCaptureVideoPreviewLayer(session: avSession!)
+        cameraPreview.videoGravity = .resizeAspectFill
         view.layer.addSublayer(cameraPreview)
         cameraPreview.frame = view.frame
     }
