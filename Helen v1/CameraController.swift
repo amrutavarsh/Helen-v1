@@ -35,6 +35,7 @@ class CameraViewController : UIViewController, AVCaptureFileOutputRecordingDeleg
         //nothing
     }
     
+    var videoOutput: AVCaptureVideoDataOutput?
     
     var avSession: AVCaptureSession?
     
@@ -50,6 +51,8 @@ class CameraViewController : UIViewController, AVCaptureFileOutputRecordingDeleg
     var captureAudioInput :AVCaptureDeviceInput?
     var captureDeviceAudioFound:Bool = false
     
+    var cameraPreview :AVCaptureVideoPreviewLayer?
+    
     override func viewDidLoad() {
         super.viewDidLoad()
         loadCamera()
@@ -61,12 +64,18 @@ class CameraViewController : UIViewController, AVCaptureFileOutputRecordingDeleg
         findCameras()
         configureVideoInputs()
         configureAudioInputs()
-        avSession!.startRunning()
         
-        let cameraPreview = AVCaptureVideoPreviewLayer(session: avSession!)
-        cameraPreview.videoGravity = .resizeAspectFill
-        view.layer.addSublayer(cameraPreview)
-        cameraPreview.frame = view.frame
+        cameraPreview = AVCaptureVideoPreviewLayer(session: avSession!)
+        cameraPreview?.videoGravity = .resizeAspectFill
+        view.layer.addSublayer(cameraPreview!)
+        cameraPreview?.frame = view.frame
+        
+        avSession!.startRunning()
+    }
+    
+    override func viewDidLayoutSubviews() {
+        super.viewDidLayoutSubviews()
+        self.cameraPreview?.frame = view.frame
     }
     
     func findCameras(){

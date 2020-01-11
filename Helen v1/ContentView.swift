@@ -13,10 +13,11 @@ struct ContentView: View {
     @State var showCreatorsInfo = false
     var body: some View {
         ZStack{
-            camView
+            //camView
             
             //Use for UIViewDebug
-            //Rectangle().fill(Color.green)
+            Rectangle().fill(Color.green)
+            
             VStack(alignment: .trailing) {
                 ZStack(alignment: .bottom){
                     Rectangle().fill(Color.white).frame(height:105).opacity(0.7)
@@ -38,6 +39,8 @@ struct ContentView: View {
                 
                 Spacer()
                 
+                Group{
+                
                 VStack(alignment: .trailing){
                     Button(action:{self.camView.callSwitchCam()}){
                         Text("Flip cam").fontWeight(.bold).padding(7)
@@ -50,7 +53,8 @@ struct ContentView: View {
                     }
                 }.padding(.horizontal)
                 
-                RoundedRectangle(cornerRadius:30).opacity(0.7).frame(height: 200)
+                RoundedRectangle(cornerRadius:30).opacity(0.7).frame(height: 250)
+                }.offset(y:30)
                 
                 
             }
