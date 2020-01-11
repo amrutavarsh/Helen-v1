@@ -15,12 +15,17 @@
                         <rect key="frame" x="0.0" y="0.0" width="414" height="896"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                         <subviews>
-                            <imageView clipsSubviews="YES" userInteractionEnabled="NO" contentMode="scaleAspectFit" fixedFrame="YES" image="helen splashscreen-1" translatesAutoresizingMaskIntoConstraints="NO" id="dJm-5Q-dhZ">
+                            <imageView clipsSubviews="YES" userInteractionEnabled="NO" contentMode="scaleAspectFit" misplaced="YES" image="helen splashscreen-1" translatesAutoresizingMaskIntoConstraints="NO" id="dJm-5Q-dhZ">
                                 <rect key="frame" x="146" y="368" width="122" height="162"/>
-                                <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
                             </imageView>
                         </subviews>
                         <color key="backgroundColor" systemColor="systemBackgroundColor" cocoaTouchSystemColor="whiteColor"/>
+                        <constraints>
+                            <constraint firstItem="dJm-5Q-dhZ" firstAttribute="centerY" secondItem="Ze5-6b-2t3" secondAttribute="centerY" id="D65-e4-Fvo"/>
+                            <constraint firstItem="dJm-5Q-dhZ" firstAttribute="centerX" secondItem="Ze5-6b-2t3" secondAttribute="centerX" id="a0u-DM-lmB"/>
+                            <constraint firstItem="dJm-5Q-dhZ" firstAttribute="top" secondItem="6Tk-OE-BBY" secondAttribute="top" constant="324" id="m8l-jl-BlL"/>
+                            <constraint firstItem="dJm-5Q-dhZ" firstAttribute="leading" secondItem="6Tk-OE-BBY" secondAttribute="leading" constant="146" id="vXD-4h-e1h"/>
+                        </constraints>
                         <viewLayoutGuide key="safeArea" id="6Tk-OE-BBY"/>
                     </view>
                 </viewController>

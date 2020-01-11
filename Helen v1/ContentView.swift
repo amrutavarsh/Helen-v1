@@ -10,6 +10,7 @@ import SwiftUI
 
 struct ContentView: View {
     let camView = CameraView()
+    @State var showCreatorsInfo = false
     var body: some View {
         VStack {
             HStack{
@@ -21,16 +22,18 @@ struct ContentView: View {
                     Text("Only clear conversations").font(.subheadline)
                 }
                 Spacer()
-                Button(action:{}){Text("</>").fontWeight(.bold).padding(7).foregroundColor(Color.white).background(Color.blue).cornerRadius(30)
+                Button(action:{self.showCreatorsInfo.toggle()}){Text("</>").fontWeight(.bold).padding(7).foregroundColor(Color.white).background(Color.blue).cornerRadius(30)
                 }
             }.padding(.horizontal)
             
             ZStack(alignment: .trailing){
                 camView
                 
+                //Use for UIViewDebug
+                //Rectangle().fill(Color.green)
+                
                 VStack(alignment: .trailing){
                     Spacer()
-                    
                     
                     VStack(alignment: .trailing){
                     Button(action:{self.camView.callSwitchCam()}){
@@ -38,18 +41,18 @@ struct ContentView: View {
                         .foregroundColor(Color.white).background(Color.black).cornerRadius(10)
                     }.padding(.vertical)
                     
-                    Button(action:{}){
+                        Button(action:{}){
                         Text("Start/Stop").fontWeight(.bold).padding(7)
                         .foregroundColor(Color.white).background(Color.blue).cornerRadius(10)
                     }
                     }.padding(.horizontal)
                 
-                    RoundedRectangle(cornerRadius:30).opacity(0.5).frame(height: 200)
-                }
+                    RoundedRectangle(cornerRadius:30).opacity(0.7).frame(height: 220)
+                }.offset(y:30)
                 
             }.edgesIgnoringSafeArea(.bottom)
             
-        }
+        }.sheet(isPresented: $showCreatorsInfo, content: {CreatorsInfo()})
     }
 }
 
