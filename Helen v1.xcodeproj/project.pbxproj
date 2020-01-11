@@ -9,7 +9,6 @@
 /* Begin PBXBuildFile section */
 		F40B074023C76D1500CBB9F9 /* CameraController.swift in Sources */ = {isa = PBXBuildFile; fileRef = F40B073F23C76D1500CBB9F9 /* CameraController.swift */; };
 		F40BDACE23C911E100FF033C /* CreatorsInfo.swift in Sources */ = {isa = PBXBuildFile; fileRef = F40BDACD23C911E100FF033C /* CreatorsInfo.swift */; };
-		F40BDAD023C97FC200FF033C /* TextView.swift in Sources */ = {isa = PBXBuildFile; fileRef = F40BDACF23C97FC200FF033C /* TextView.swift */; };
 		F4A3B178238EC02500C5CCB0 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = F4A3B177238EC02500C5CCB0 /* AppDelegate.swift */; };
 		F4A3B17A238EC02500C5CCB0 /* SceneDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = F4A3B179238EC02500C5CCB0 /* SceneDelegate.swift */; };
 		F4A3B17C238EC02500C5CCB0 /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = F4A3B17B238EC02500C5CCB0 /* ContentView.swift */; };
@@ -40,7 +39,6 @@
 /* Begin PBXFileReference section */
 		F40B073F23C76D1500CBB9F9 /* CameraController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CameraController.swift; sourceTree = "<group>"; };
 		F40BDACD23C911E100FF033C /* CreatorsInfo.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CreatorsInfo.swift; sourceTree = "<group>"; };
-		F40BDACF23C97FC200FF033C /* TextView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TextView.swift; sourceTree = "<group>"; };
 		F4A3B174238EC02500C5CCB0 /* Helen v1.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "Helen v1.app"; sourceTree = BUILT_PRODUCTS_DIR; };
 		F4A3B177238EC02500C5CCB0 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		F4A3B179238EC02500C5CCB0 /* SceneDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SceneDelegate.swift; sourceTree = "<group>"; };
@@ -114,7 +112,6 @@
 				F4A3B17F238EC02A00C5CCB0 /* Preview Content */,
 				F40B073F23C76D1500CBB9F9 /* CameraController.swift */,
 				F40BDACD23C911E100FF033C /* CreatorsInfo.swift */,
-				F40BDACF23C97FC200FF033C /* TextView.swift */,
 			);
 			path = "Helen v1";
 			sourceTree = "<group>";
@@ -279,7 +276,6 @@
 				F4A3B178238EC02500C5CCB0 /* AppDelegate.swift in Sources */,
 				F40BDACE23C911E100FF033C /* CreatorsInfo.swift in Sources */,
 				F4A3B17A238EC02500C5CCB0 /* SceneDelegate.swift in Sources */,
-				F40BDAD023C97FC200FF033C /* TextView.swift in Sources */,
 				F40B074023C76D1500CBB9F9 /* CameraController.swift in Sources */,
 				F4A3B17C238EC02500C5CCB0 /* ContentView.swift in Sources */,
 			);
