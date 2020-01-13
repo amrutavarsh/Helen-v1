@@ -9,6 +9,9 @@
 import UIKit
 import SwiftUI
 import AVFoundation
+import Vision
+
+var useAudio:Bool = false
 
 public enum CameraPosition {
     case front
@@ -30,14 +33,15 @@ struct CameraView : UIViewControllerRepresentable {
     func callSwitchCam() {controller.switchCamera()}
 }
 
-class CameraViewController : UIViewController, AVCaptureFileOutputRecordingDelegate {
+class CameraViewController : UIViewController, AVCaptureVideoDataOutputSampleBufferDelegate {
     func fileOutput(_ output: AVCaptureFileOutput, didFinishRecordingTo outputFileURL: URL, from connections: [AVCaptureConnection], error: Error?) {
         //nothing
     }
     
-    var videoOutput: AVCaptureVideoDataOutput?
+    var videoDataOutput: AVCaptureVideoDataOutput!
+    var videoDataOutputQueue: DispatchQueue!
     
-    var avSession: AVCaptureSession?
+    var avSession: AVCaptureSession!
     
     var currentCameraPosition: CameraPosition?
     
@@ -53,6 +57,8 @@ class CameraViewController : UIViewController, AVCaptureFileOutputRecordingDeleg
     
     var cameraPreview :AVCaptureVideoPreviewLayer?
     
+    let context =  CIContext()
+    
     override func viewDidLoad() {
         super.viewDidLoad()
         loadCamera()
@@ -63,13 +69,14 @@ class CameraViewController : UIViewController, AVCaptureFileOutputRecordingDeleg
         
         findCameras()
         configureVideoInputs()
-        configureAudioInputs()
+        configureVideoOutput()
+        
+        if useAudio{configureAudioInputs()}
         
         cameraPreview = AVCaptureVideoPreviewLayer(session: avSession!)
         cameraPreview?.videoGravity = .resizeAspectFill
         view.layer.addSublayer(cameraPreview!)
         cameraPreview?.frame = view.frame
-        
         avSession!.startRunning()
     }
     
@@ -119,6 +126,19 @@ class CameraViewController : UIViewController, AVCaptureFileOutputRecordingDeleg
             
             self.currentCameraPosition = .front
         }
+    }
+    
+    func configureVideoOutput(){
+        videoDataOutput = AVCaptureVideoDataOutput()
+        videoDataOutput.alwaysDiscardsLateVideoFrames=true
+        videoDataOutputQueue = DispatchQueue(label: "VideoDataOutputQueue")
+        videoDataOutput.setSampleBufferDelegate(self, queue:self.videoDataOutputQueue)
+        
+        if avSession.canAddOutput(self.videoDataOutput){
+            avSession.addOutput(self.videoDataOutput)
+        }
+        
+        videoDataOutput.connection(with: .video)?.isEnabled = true
     }
     
     func configureAudioInputs(){
@@ -179,6 +199,33 @@ class CameraViewController : UIViewController, AVCaptureFileOutputRecordingDeleg
         }
         
         avSession.commitConfiguration()
+    }
+    
+    func captureOutput(_ output: AVCaptureOutput, didOutput sampleBuffer: CMSampleBuffer, from connection: AVCaptureConnection) {
+        // do stuff here
+        print("Got a frame")
+        DispatchQueue.main.async { [unowned self] in
+            guard self.imageFromSampleBuffer(sampleBuffer: sampleBuffer) != nil else { return }
+            
+            
+        }
+        
+    }
+    
+    func imageFromSampleBuffer(sampleBuffer : CMSampleBuffer) -> UIImage? {
+        guard let imageBuffer = CMSampleBufferGetImageBuffer(sampleBuffer) else { return nil }
+        
+        let ciImage = CIImage(cvPixelBuffer: imageBuffer)
+        
+        //UIImageWriteToSavedPhotosAlbum(UIImage *image, id completionTarget, SEL completionSelector, void *contextInfo)
+        
+        guard let cgImage = context.createCGImage(ciImage, from: ciImage.extent) else { return nil }
+        
+        return UIImage(cgImage: cgImage)
+    }
+    
+    func stopCamera(){
+        avSession.stopRunning()
     }
     
 }

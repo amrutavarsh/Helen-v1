@@ -13,10 +13,10 @@ struct ContentView: View {
     @State var showCreatorsInfo = false
     var body: some View {
         ZStack{
-            //camView
+            camView
             
             //Use for UIViewDebug
-            Rectangle().fill(Color.green)
+            //Rectangle().fill(Color.green)
             
             VStack(alignment: .trailing) {
                 ZStack(alignment: .bottom){
@@ -40,21 +40,26 @@ struct ContentView: View {
                 Spacer()
                 
                 Group{
-                
-                VStack(alignment: .trailing){
-                    Button(action:{self.camView.callSwitchCam()}){
-                        Text("Flip cam").fontWeight(.bold).padding(7)
-                            .foregroundColor(Color.white).background(Color.black).cornerRadius(10)
-                    }.padding(.vertical)
                     
-                    Button(action:{}){
-                        Text("Start/Stop").fontWeight(.bold).padding(7)
-                            .foregroundColor(Color.white).background(Color.blue).cornerRadius(10)
-                    }
-                }.padding(.horizontal)
-                
-                RoundedRectangle(cornerRadius:30).opacity(0.7).frame(height: 250)
-                }.offset(y:30)
+                    VStack(alignment: .trailing){
+                        Button(action:{self.camView.callSwitchCam()}){
+                            Text("Flip cam").fontWeight(.bold).padding(7)
+                                .foregroundColor(Color.white).background(Color.black).cornerRadius(10)
+                        }.padding(.vertical)
+                        
+                        Button(action:{}){
+                            Text("Start/Stop").fontWeight(.bold).padding(7)
+                                .foregroundColor(Color.white).background(Color.blue).cornerRadius(10)
+                        }
+                    }.padding(.horizontal)
+                    
+                    ZStack{
+                        
+                        RoundedRectangle(cornerRadius:30).opacity(0.7).frame(height: 250)
+                        
+                        TextField(/*@START_MENU_TOKEN@*/"Placeholder"/*@END_MENU_TOKEN@*/, text: /*@START_MENU_TOKEN@*//*@PLACEHOLDER=Value@*/.constant("")/*@END_MENU_TOKEN@*/).frame(height: 160).padding()
+                    }.offset(y:30).padding(.top, -30)
+                }
                 
                 
             }
