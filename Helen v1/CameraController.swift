@@ -31,12 +31,18 @@ struct CameraView : UIViewControllerRepresentable {
     }
     
     func callSwitchCam() {controller.switchCamera()}
+    func toggleStartStream() {controller.startStream.toggle()}
+    
 }
 
 class CameraViewController : UIViewController, AVCaptureVideoDataOutputSampleBufferDelegate {
     func fileOutput(_ output: AVCaptureFileOutput, didFinishRecordingTo outputFileURL: URL, from connections: [AVCaptureConnection], error: Error?) {
         //nothing
     }
+    
+    var startStream = false
+    
+    var frame_counter = 1
     
     var videoDataOutput: AVCaptureVideoDataOutput!
     var videoDataOutputQueue: DispatchQueue!
@@ -92,6 +98,10 @@ class CameraViewController : UIViewController, AVCaptureVideoDataOutputSampleBuf
         for camera in cameras {
             if camera.position == .front {
                 self.frontCamera = camera
+                try! camera.lockForConfiguration()
+                self.frontCamera!.activeVideoMaxFrameDuration = CMTimeMake(value: 1, timescale: Int32(30))
+                self.frontCamera!.activeVideoMinFrameDuration = CMTimeMake(value: 1, timescale: Int32(30))
+                camera.unlockForConfiguration()
             }
             
             if camera.position == .back {
@@ -99,6 +109,8 @@ class CameraViewController : UIViewController, AVCaptureVideoDataOutputSampleBuf
                 
                 try! camera.lockForConfiguration()
                 camera.focusMode = .continuousAutoFocus
+                self.rearCamera!.activeVideoMaxFrameDuration = CMTimeMake(value: 1, timescale: Int32(30))
+                self.rearCamera!.activeVideoMinFrameDuration = CMTimeMake(value: 1, timescale: Int32(30))
                 camera.unlockForConfiguration()
             }
         }
@@ -202,14 +214,19 @@ class CameraViewController : UIViewController, AVCaptureVideoDataOutputSampleBuf
     }
     
     func captureOutput(_ output: AVCaptureOutput, didOutput sampleBuffer: CMSampleBuffer, from connection: AVCaptureConnection) {
-        // do stuff here
-        print("Got a frame")
-        DispatchQueue.main.async { [unowned self] in
-            guard self.imageFromSampleBuffer(sampleBuffer: sampleBuffer) != nil else { return }
-            
-            
-        }
         
+        if self.startStream{
+            print("Got a frame \(frame_counter)")
+            DispatchQueue.main.async { [unowned self] in
+                guard let uiImage = self.imageFromSampleBuffer(sampleBuffer: sampleBuffer) else { return }
+                //if let data = uiImage.jpegData(compressionQuality: 0.8) {
+                    //let filename = self.getDocumentsDirectory().appendingPathComponent("frame component \(self.frame_counter).jpeg")
+                    //try? data.write(to: filename)
+                    UIImageWriteToSavedPhotosAlbum(uiImage, nil, nil, nil);
+                    self.frame_counter = self.frame_counter + 1
+                //}
+            }
+        }
     }
     
     func imageFromSampleBuffer(sampleBuffer : CMSampleBuffer) -> UIImage? {
@@ -217,11 +234,14 @@ class CameraViewController : UIViewController, AVCaptureVideoDataOutputSampleBuf
         
         let ciImage = CIImage(cvPixelBuffer: imageBuffer)
         
-        //UIImageWriteToSavedPhotosAlbum(UIImage *image, id completionTarget, SEL completionSelector, void *contextInfo)
-        
         guard let cgImage = context.createCGImage(ciImage, from: ciImage.extent) else { return nil }
         
         return UIImage(cgImage: cgImage)
+    }
+    
+    func getDocumentsDirectory() -> URL {
+        let paths = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask)
+        return paths[0]
     }
     
     func stopCamera(){
