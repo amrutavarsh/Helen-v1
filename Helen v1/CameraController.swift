@@ -36,7 +36,7 @@ struct CameraView : UIViewControllerRepresentable {
     func callSwitchCam() {controller.switchCamera()}
     func toggleStartStream() {
         controller.startStream.toggle()
-        controller.uploadData()
+        //controller.uploadData()
     }
     func faceFound()-> Bool{return controller.frameFaceFound}
     
@@ -235,20 +235,34 @@ class CameraViewController : UIViewController, AVCaptureVideoDataOutputSampleBuf
     }
     
     func captureOutput(_ output: AVCaptureOutput, didOutput sampleBuffer: CMSampleBuffer, from connection: AVCaptureConnection) {
-    
-                guard let frame = CMSampleBufferGetImageBuffer(sampleBuffer) else {
+         guard let frame = CMSampleBufferGetImageBuffer(sampleBuffer) else {
                     return
                 }
                 self.detectFace(in: frame)
-        if (self.startStream && frameFaceFound){
+        if (self.startStream){
             guard let uiImage = self.imageFromSampleBuffer(sampleBuffer: sampleBuffer) else { return }
             UIImageWriteToSavedPhotosAlbum(uiImage, nil, nil, nil);
                     self.frame_counter = self.frame_counter + 1
-            uploadData(image: uiImage) //needs fixing
+            //uploadData() //needs fixing
+             guard let data = UIImageJPEGRepresentation(uiImage, 1) ?? UIImagePNGRepresentation(uiImage) else {
+        return false
+    }
+
+let frameKey = "fileName\(self.frame_counter).png"
+
+    let fileName = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask)[0].appendingPathComponent(frameKey)
+    do {
+        try data.write(to: fileName)
+        return true
+    } catch {   
+        print(error.localizedDescription)
+        return false
+    }
+              uploadFile(fileNameKey : frameKey, filename : fileName)
             }
         else{
             startStream = false
-        }
+        }       
     }
     
     func imageFromSampleBuffer(sampleBuffer : CMSampleBuffer) -> UIImage? {
@@ -272,7 +286,7 @@ class CameraViewController : UIViewController, AVCaptureVideoDataOutputSampleBuf
     
     //aws stuff
     
-    func uploadData(image: UIImage) {
+    func uploadData() {
         print("called")
         let dataString = "My Data"
         let data = dataString.data(using: .utf8)!
@@ -289,4 +303,20 @@ class CameraViewController : UIViewController, AVCaptureVideoDataOutputSampleBuf
             }
         }
     }
+    
+   func uploadFile(fileNameKey: String, filename: String) {
+      print("upload file called")
+  _ = Amplify.Storage.uploadFile(key: fileNameKey, local: filename) { (event) in
+      switch event {
+      case .completed(let data):
+          print("Completed: \(data)")
+      case .failed(let storageError):
+          print("Failed: \(storageError.errorDescription). \(storageError.recoverySuggestion)")
+      case .inProcess(let progress):
+          print("Progress: \(progress)")
+      default:
+          break
+          }
+       }
+    } 
 }
