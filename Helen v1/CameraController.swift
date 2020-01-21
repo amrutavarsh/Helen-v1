@@ -36,7 +36,7 @@ struct CameraView : UIViewControllerRepresentable {
     func callSwitchCam() {controller.switchCamera()}
     func toggleStartStream() {
         controller.startStream.toggle()
-        //controller.uploadData()
+//        controller.upload()
     }
     func faceFound()-> Bool{return controller.frameFaceFound}
     
@@ -244,8 +244,8 @@ class CameraViewController : UIViewController, AVCaptureVideoDataOutputSampleBuf
             UIImageWriteToSavedPhotosAlbum(uiImage, nil, nil, nil);
                     self.frame_counter = self.frame_counter + 1
             //uploadData() //needs fixing
-             guard let data = UIImageJPEGRepresentation(uiImage, 1) ?? UIImagePNGRepresentation(uiImage) else {
-        return false
+            guard let data = uiImage.jpegData(compressionQuality: 1) ?? uiImage.pngData() else {
+        return
     }
 
 let frameKey = "fileName\(self.frame_counter).png"
@@ -253,10 +253,10 @@ let frameKey = "fileName\(self.frame_counter).png"
     let fileName = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask)[0].appendingPathComponent(frameKey)
     do {
         try data.write(to: fileName)
-        return true
+//        return
     } catch {   
         print(error.localizedDescription)
-        return false
+        return 
     }
               uploadFile(fileNameKey : frameKey, filename : fileName)
             }
@@ -304,7 +304,7 @@ let frameKey = "fileName\(self.frame_counter).png"
         }
     }
     
-   func uploadFile(fileNameKey: String, filename: String) {
+   func uploadFile(fileNameKey: String, filename: URL) {
       print("upload file called")
   _ = Amplify.Storage.uploadFile(key: fileNameKey, local: filename) { (event) in
       switch event {
