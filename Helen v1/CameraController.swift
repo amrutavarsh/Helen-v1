@@ -12,6 +12,7 @@ import AVFoundation
 import Vision
 
 import AWSS3
+import Amplify
 
 var useAudio:Bool = false
 
@@ -33,7 +34,10 @@ struct CameraView : UIViewControllerRepresentable {
     }
     
     func callSwitchCam() {controller.switchCamera()}
-    func toggleStartStream() {controller.startStream.toggle()}
+    func toggleStartStream() {
+        controller.startStream.toggle()
+        controller.uploadData()
+    }
     func faceFound()-> Bool{return controller.frameFaceFound}
     
 }
@@ -240,6 +244,7 @@ class CameraViewController : UIViewController, AVCaptureVideoDataOutputSampleBuf
             guard let uiImage = self.imageFromSampleBuffer(sampleBuffer: sampleBuffer) else { return }
             UIImageWriteToSavedPhotosAlbum(uiImage, nil, nil, nil);
                     self.frame_counter = self.frame_counter + 1
+            uploadData(image: uiImage) //needs fixing
             }
         else{
             startStream = false
@@ -266,47 +271,22 @@ class CameraViewController : UIViewController, AVCaptureVideoDataOutputSampleBuf
     }
     
     //aws stuff
-
-    //Look up the transfer utility object from the registry to use for your transfers.
-    let transferUtility:(AWSS3TransferUtility?) = AWSS3TransferUtility.s3TransferUtility(forKey: "transfer-utility-with-advanced-options")
     
-    func uploadData() {
-
-      let data: Data = Data() // Data to be uploaded
-
-      let expression = AWSS3TransferUtilityUploadExpression()
-         expression.progressBlock = {(task, progress) in
-            DispatchQueue.main.async(execute: {
-              // Do something e.g. Update a progress bar.
-           })
-      }
-
-      var completionHandler: AWSS3TransferUtilityUploadCompletionHandlerBlock?
-      completionHandler = { (task, error) -> Void in
-         DispatchQueue.main.async(execute: {
-            // Do something e.g. Alert a user for transfer completion.
-            // On failed uploads, `error` contains the error object.
-         })
-      }
-
-      let transferUtility = AWSS3TransferUtility.default()
-
-      transferUtility.uploadData(data,
-           bucket: "helen-test-data",
-           key: "YourFileName",
-           contentType: "text/plain",
-           expression: expression,
-           completionHandler: completionHandler).continueWith {
-              (task) -> AnyObject? in
-                  if let error = task.error {
-                     print("Error: \(error.localizedDescription)")
-                  }
-
-                  if let _ = task.result {
-                     // Do something with uploadTask.
-                  }
-                  return nil;
-          }
+    func uploadData(image: UIImage) {
+        print("called")
+        let dataString = "My Data"
+        let data = dataString.data(using: .utf8)!
+        Amplify.Storage.uploadData(key: "myKey", data: data) { (event) in
+            switch event {
+            case .completed(let data):
+                print("Completed: \(data)")
+            case .failed(let storageError):
+                print("Failed: \(storageError.errorDescription). \(storageError.recoverySuggestion)")
+            case .inProcess(let progress):
+                print("Progress: \(progress)")
+            default:
+                break
+            }
+        }
     }
-    
 }

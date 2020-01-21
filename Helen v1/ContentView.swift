@@ -56,10 +56,10 @@ struct ContentView: View {
                         }.padding(.vertical)
                         
                         Button(action:{
-                            if self.camView.faceFound(){
+//                            if self.camView.faceFound(){
                             self.camView.toggleStartStream()
                             self.startStream.toggle()
-                            }
+//                            }
                         }){
                             Text(recordButtonText(streamState: self.startStream)).fontWeight(.bold).padding(7).foregroundColor(Color.white).background(recordButtonColor(streamState: self.startStream)).cornerRadius(10)
                         }

@@ -8,6 +8,9 @@
 
 import UIKit
 import AWSS3
+import Amplify
+import AWSMobileClient
+import AmplifyPlugins
 
 @UIApplicationMain
 class AppDelegate: UIResponder, UIApplicationDelegate {
@@ -16,21 +19,24 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
 
     func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]?) -> Bool {
         // Override point for customization after application launch.
-        let credentialProvider = AWSCognitoCredentialsProvider(regionType: .USEast1, identityPoolId: "us-east-1:eb1de7db-5e6c-4050-ad9b-b34a41dbf285")
+        
+        AWSMobileClient.default().initialize { (userState, error) in
+            guard error == nil else {
+                print("Error initializing AWSMobileClient. Error: \(error!.localizedDescription)")
+                return
+            }
+            print("AWSMobileClient initialized, userstate: \(userState)")
+        }
 
-            //Setup the service configuration
-            let configuration = AWSServiceConfiguration(region: .USEast1, credentialsProvider: credentialProvider)
+        let storagePlugin = AWSS3StoragePlugin()
+        do {
+            try Amplify.add(plugin: storagePlugin)
+            try Amplify.configure()
+            print("Amplify configured with storage plugin")
+        } catch {
+            print("Failed to initialize Amplify with \(error)")
+        }
 
-            //Setup the transfer utility configuration
-            let tuConf = AWSS3TransferUtilityConfiguration()
-        //    tuConf.isAccelerateModeEnabled = true
-
-            //Register a transfer utility object asynchronously
-            AWSS3TransferUtility.register(
-                with: configuration!,
-                transferUtilityConfiguration: tuConf,
-                forKey: "transfer-utility-with-advanced-options"
-            )
         return true
     }
 
