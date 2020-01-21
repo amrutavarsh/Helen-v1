@@ -17,10 +17,10 @@ struct ContentView: View {
     func faceOpacity()->CGFloat{return (camView.faceFound() ? 0.0 :0.7)}
     var body: some View {
         ZStack{
-            //camView
+            camView
             
-            //Use for UIViewDebug
-            Rectangle().fill(Color.green)
+//            Use for UIViewDebug
+//            Rectangle().fill(Color.green)
             
             VStack{
                 ZStack(alignment: .bottom){

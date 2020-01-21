@@ -11,6 +11,8 @@ import SwiftUI
 import AVFoundation
 import Vision
 
+import AWSS3
+
 var useAudio:Bool = false
 
 public enum CameraPosition {
@@ -261,6 +263,50 @@ class CameraViewController : UIViewController, AVCaptureVideoDataOutputSampleBuf
     
     func stopCamera(){
         avSession.stopRunning()
+    }
+    
+    //aws stuff
+
+    //Look up the transfer utility object from the registry to use for your transfers.
+    let transferUtility:(AWSS3TransferUtility?) = AWSS3TransferUtility.s3TransferUtility(forKey: "transfer-utility-with-advanced-options")
+    
+    func uploadData() {
+
+      let data: Data = Data() // Data to be uploaded
+
+      let expression = AWSS3TransferUtilityUploadExpression()
+         expression.progressBlock = {(task, progress) in
+            DispatchQueue.main.async(execute: {
+              // Do something e.g. Update a progress bar.
+           })
+      }
+
+      var completionHandler: AWSS3TransferUtilityUploadCompletionHandlerBlock?
+      completionHandler = { (task, error) -> Void in
+         DispatchQueue.main.async(execute: {
+            // Do something e.g. Alert a user for transfer completion.
+            // On failed uploads, `error` contains the error object.
+         })
+      }
+
+      let transferUtility = AWSS3TransferUtility.default()
+
+      transferUtility.uploadData(data,
+           bucket: "helen-test-data",
+           key: "YourFileName",
+           contentType: "text/plain",
+           expression: expression,
+           completionHandler: completionHandler).continueWith {
+              (task) -> AnyObject? in
+                  if let error = task.error {
+                     print("Error: \(error.localizedDescription)")
+                  }
+
+                  if let _ = task.result {
+                     // Do something with uploadTask.
+                  }
+                  return nil;
+          }
     }
     
 }
