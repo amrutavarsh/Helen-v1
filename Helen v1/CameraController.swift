@@ -32,6 +32,7 @@ struct CameraView : UIViewControllerRepresentable {
     
     func callSwitchCam() {controller.switchCamera()}
     func toggleStartStream() {controller.startStream.toggle()}
+    func faceFound()-> Bool{return controller.frameFaceFound}
     
 }
 
@@ -43,6 +44,7 @@ class CameraViewController : UIViewController, AVCaptureVideoDataOutputSampleBuf
     var startStream = false
     
     var frame_counter = 1
+    var frameFaceFound: Bool = true
     
     var videoDataOutput: AVCaptureVideoDataOutput!
     var videoDataOutputQueue: DispatchQueue!
@@ -213,19 +215,32 @@ class CameraViewController : UIViewController, AVCaptureVideoDataOutputSampleBuf
         avSession.commitConfiguration()
     }
     
-    func captureOutput(_ output: AVCaptureOutput, didOutput sampleBuffer: CMSampleBuffer, from connection: AVCaptureConnection) {
-        
-        if self.startStream{
-            print("Got a frame \(frame_counter)")
-            DispatchQueue.main.async { [unowned self] in
-                guard let uiImage = self.imageFromSampleBuffer(sampleBuffer: sampleBuffer) else { return }
-                //if let data = uiImage.jpegData(compressionQuality: 0.8) {
-                    //let filename = self.getDocumentsDirectory().appendingPathComponent("frame component \(self.frame_counter).jpeg")
-                    //try? data.write(to: filename)
-                    UIImageWriteToSavedPhotosAlbum(uiImage, nil, nil, nil);
-                    self.frame_counter = self.frame_counter + 1
-                //}
+    private func detectFace(in image: CVPixelBuffer) {
+        let faceDetectionRequest = VNDetectFaceLandmarksRequest(completionHandler: { (request: VNRequest, error: Error?) in
+            DispatchQueue.main.async {
+                if let results = request.results as? [VNFaceObservation], results.count > 0 {
+                    self.frameFaceFound = true
+                } else {
+                    self.frameFaceFound = false                }
             }
+        })
+        let imageRequestHandler = VNImageRequestHandler(cvPixelBuffer: image, orientation: .leftMirrored, options: [:])
+        try? imageRequestHandler.perform([faceDetectionRequest])
+    }
+    
+    func captureOutput(_ output: AVCaptureOutput, didOutput sampleBuffer: CMSampleBuffer, from connection: AVCaptureConnection) {
+    
+                guard let frame = CMSampleBufferGetImageBuffer(sampleBuffer) else {
+                    return
+                }
+                self.detectFace(in: frame)
+        if (self.startStream && frameFaceFound){
+            guard let uiImage = self.imageFromSampleBuffer(sampleBuffer: sampleBuffer) else { return }
+            UIImageWriteToSavedPhotosAlbum(uiImage, nil, nil, nil);
+                    self.frame_counter = self.frame_counter + 1
+            }
+        else{
+            startStream = false
         }
     }
     

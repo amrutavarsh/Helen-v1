@@ -12,14 +12,17 @@ struct ContentView: View {
     let camView = CameraView()
     @State var startStream = false
     @State var showCreatorsInfo = false
+    func recordButtonText(streamState: Bool) -> String {return (streamState ? "Stop" : "Start")}
+    func recordButtonColor(streamState: Bool) -> Color {return (streamState ? Color.red : Color.blue)}
+    func faceOpacity()->CGFloat{return (camView.faceFound() ? 0.0 :0.7)}
     var body: some View {
         ZStack{
-            camView
+            //camView
             
             //Use for UIViewDebug
-            //Rectangle().fill(Color.green)
+            Rectangle().fill(Color.green)
             
-            VStack(alignment: .trailing) {
+            VStack{
                 ZStack(alignment: .bottom){
                     Rectangle().fill(Color.white).frame(height:105).opacity(0.7)
                     
@@ -38,23 +41,30 @@ struct ContentView: View {
                     
                 }
                 
+                Text("Face not detected").padding(7).foregroundColor(Color.white).background(Color.red).cornerRadius(30).opacity(0.7)
+                
+                
                 Spacer()
                 
                 Group{
-                    
+                    HStack{
+                        Spacer()
                     VStack(alignment: .trailing){
-                        Button(action:{self.camView.callSwitchCam()}){
+                         Button(action:{self.camView.callSwitchCam()}){
                             Text("Flip cam").fontWeight(.bold).padding(7)
                                 .foregroundColor(Color.white).background(Color.black).cornerRadius(10)
                         }.padding(.vertical)
                         
                         Button(action:{
+                            if self.camView.faceFound(){
                             self.camView.toggleStartStream()
                             self.startStream.toggle()
+                            }
                         }){
                             Text(recordButtonText(streamState: self.startStream)).fontWeight(.bold).padding(7).foregroundColor(Color.white).background(recordButtonColor(streamState: self.startStream)).cornerRadius(10)
                         }
                     }.padding(.horizontal)
+                }
                     
                     ZStack{
                         
@@ -68,9 +78,6 @@ struct ContentView: View {
         }.edgesIgnoringSafeArea(.all)
     }
 }
-
-func recordButtonText(streamState: Bool) -> String {return (streamState ? "Stop" : "Start")}
-func recordButtonColor(streamState: Bool) -> Color {return (streamState ? Color.red : Color.blue)}
 
 struct ContentView_Previews: PreviewProvider {
     static var previews: some View {
