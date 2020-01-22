@@ -25,7 +25,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
                 print("Error initializing AWSMobileClient. Error: \(error!.localizedDescription)")
                 return
             }
-            print("AWSMobileClient initialized, userstate: \(userState)")
+            print("AWSMobileClient initialized, userstate: \(userState ?? "not assigned")")
         }
 
         let storagePlugin = AWSS3StoragePlugin()

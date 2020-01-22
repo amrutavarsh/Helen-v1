@@ -48,8 +48,9 @@ class CameraViewController : UIViewController, AVCaptureVideoDataOutputSampleBuf
     }
     
     var startStream = false
-    var prevStartStream = startStream
+    var prevStartStream = false
     var frame_counter = 1
+    var videoID = 1
     var frameFaceFound: Bool = true
     
     var videoDataOutput: AVCaptureVideoDataOutput!
@@ -75,7 +76,7 @@ class CameraViewController : UIViewController, AVCaptureVideoDataOutputSampleBuf
     let outputSize = CGSize(width: 1920, height: 1280)
     let imagesPerSecond: TimeInterval = 0.04 //each image will be stay for 3 secs
     var selectedPhotosArray = [UIImage]()
-    var imageArrayToVideoURL = NSURL()
+    var imageArrayToVideoURL: URL!
     var asset: AVAsset!
     
     override func viewDidLoad() {
@@ -245,8 +246,7 @@ class CameraViewController : UIViewController, AVCaptureVideoDataOutputSampleBuf
         let ciImage = CIImage(cvPixelBuffer: imageBuffer)
         
         guard let cgImage = context.createCGImage(ciImage, from: ciImage.extent) else { return nil }
-        let frameName = "\(self.frame_counter).JPG"
-        return UIImage(cgImage: cgImage, named: frameName)
+        return UIImage(cgImage: cgImage)
     }
     
     func captureOutput(_ output: AVCaptureOutput, didOutput sampleBuffer: CMSampleBuffer, from connection: AVCaptureConnection) {
@@ -254,7 +254,7 @@ class CameraViewController : UIViewController, AVCaptureVideoDataOutputSampleBuf
         guard let uiImage = self.imageFromSampleBuffer(sampleBuffer: sampleBuffer) else { return }
         if (self.startStream){
             //UIImageWriteToSavedPhotosAlbum(uiImage, nil, nil, nil);
-            selectedPhotosArray.append(UIImage(named: "\(self.frame_counter).JPG")!)
+            selectedPhotosArray.append(uiImage)
             //guard let data = uiImage.jpegData(compressionQuality: 1) ?? uiImage.pngData() else {return}
             //let frameKey = "fileName\(self.frame_counter).png"
             //let fileName = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask)[0].appendingPathComponent(frameKey)
@@ -269,7 +269,7 @@ class CameraViewController : UIViewController, AVCaptureVideoDataOutputSampleBuf
         }
         else{
             startStream = false
-            if prevStartStream = true{
+            if prevStartStream == true{
             buildVideoFromImageArray()
             }    
         }
@@ -277,24 +277,24 @@ class CameraViewController : UIViewController, AVCaptureVideoDataOutputSampleBuf
     }
     
     func buildVideoFromImageArray() {
-        let directory = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask)[0]
-        let fileKey = "file\(frame_counter).MP4"
-        imageArrayToVideoURL = NSURL(fileURLWithPath: directory + "/" + fileKey)
-        guard let videoWriter = try? AVAssetWriter(outputURL: imageArrayToVideoURL as URL, fileType: AVFileTypeMPEG4) else {
+        let fileKey = "file\(videoID).MP4"
+        videoID += 1
+        imageArrayToVideoURL = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask)[0].appendingPathComponent(fileKey)
+        guard let videoWriter = try? AVAssetWriter(outputURL: imageArrayToVideoURL as URL, fileType: AVFileType.mp4) else {
             fatalError("AVAssetWriter error")
         }
-        let outputSettings = [AVVideoCodecKey : AVVideoCodecH264, AVVideoWidthKey : NSNumber(value: Float(outputSize.width)), AVVideoHeightKey : NSNumber(value: Float(outputSize.height))] as [String : Any]
-        guard videoWriter.canApply(outputSettings: outputSettings, forMediaType: AVMediaTypeVideo) else {
+        let outputSettings = [AVVideoCodecKey : AVVideoCodecType.h264, AVVideoWidthKey : NSNumber(value: Float(outputSize.width)), AVVideoHeightKey : NSNumber(value: Float(outputSize.height))] as [String : Any]
+        guard videoWriter.canApply(outputSettings: outputSettings, forMediaType: AVMediaType.video) else {
             fatalError("Negative : Can't apply the Output settings...")
         }
-        let videoWriterInput = AVAssetWriterInput(mediaType: AVMediaTypeVideo, outputSettings: outputSettings)
+        let videoWriterInput = AVAssetWriterInput(mediaType: AVMediaType.video, outputSettings: outputSettings)
         let sourcePixelBufferAttributesDictionary = [kCVPixelBufferPixelFormatTypeKey as String : NSNumber(value: kCVPixelFormatType_32ARGB), kCVPixelBufferWidthKey as String: NSNumber(value: Float(outputSize.width)), kCVPixelBufferHeightKey as String: NSNumber(value: Float(outputSize.height))]
         let pixelBufferAdaptor = AVAssetWriterInputPixelBufferAdaptor(assetWriterInput: videoWriterInput, sourcePixelBufferAttributes: sourcePixelBufferAttributesDictionary)
         if videoWriter.canAdd(videoWriterInput) {
             videoWriter.add(videoWriterInput)
         }
         if videoWriter.startWriting() {
-            let zeroTime = CMTimeMake(Int64(imagesPerSecond),Int32(1))
+            let zeroTime = CMTimeMake(value: Int64(imagesPerSecond),timescale: Int32(1))
             videoWriter.startSession(atSourceTime: zeroTime)
 
             assert(pixelBufferAdaptor.pixelBufferPool != nil)
@@ -302,13 +302,13 @@ class CameraViewController : UIViewController, AVCaptureVideoDataOutputSampleBuf
             videoWriterInput.requestMediaDataWhenReady(on: media_queue, using: { () -> Void in
                 let fps: Int32 = 1
                 let framePerSecond: Int64 = Int64(self.imagesPerSecond)
-                let frameDuration = CMTimeMake(Int64(self.imagesPerSecond), fps)
+                let frameDuration = CMTimeMake(value: Int64(self.imagesPerSecond), timescale: fps)
                 var frameCount: Int64 = 0
                 var appendSucceeded = true
                 while (!self.selectedPhotosArray.isEmpty) {
                     if (videoWriterInput.isReadyForMoreMediaData) {
                         let nextPhoto = self.selectedPhotosArray.remove(at: 0)
-                        let lastFrameTime = CMTimeMake(frameCount * framePerSecond, fps)
+                        let lastFrameTime = CMTimeMake(value: frameCount * framePerSecond, timescale: fps)
                         let presentationTime = frameCount == 0 ? lastFrameTime : CMTimeAdd(lastFrameTime, frameDuration)
                         var pixelBuffer: CVPixelBuffer? = nil
                         let status: CVReturn = CVPixelBufferPoolCreatePixelBuffer(kCFAllocatorDefault, pixelBufferAdaptor.pixelBufferPool!, &pixelBuffer)
@@ -341,12 +341,12 @@ class CameraViewController : UIViewController, AVCaptureVideoDataOutputSampleBuf
                 }
                 videoWriterInput.markAsFinished()
                 videoWriter.finishWriting { () -> Void in
-                    print("-----video1 url = \(self.imageArrayToVideoURL)")
+                    print("-----video1 url = \(String(describing: self.imageArrayToVideoURL))")
                     self.asset = AVAsset(url: self.imageArrayToVideoURL as URL)
                 }
             })
         }
-        uploadFile(fileNameKey: fileKey, filename: imageArrayToVideoURL)
+        uploadFile(fileNameKey: fileKey, filename: imageArrayToVideoURL as URL)
     }
     
     func getDocumentsDirectory() -> URL {
