@@ -245,8 +245,8 @@ class CameraViewController : UIViewController, AVCaptureVideoDataOutputSampleBuf
         let ciImage = CIImage(cvPixelBuffer: imageBuffer)
         
         guard let cgImage = context.createCGImage(ciImage, from: ciImage.extent) else { return nil }
-        
-        return UIImage(cgImage: cgImage)
+        let frameName = "\(self.frame_counter).JPG"
+        return UIImage(cgImage: cgImage, named: frameName)
     }
     
     func captureOutput(_ output: AVCaptureOutput, didOutput sampleBuffer: CMSampleBuffer, from connection: AVCaptureConnection) {
@@ -254,7 +254,6 @@ class CameraViewController : UIViewController, AVCaptureVideoDataOutputSampleBuf
         guard let uiImage = self.imageFromSampleBuffer(sampleBuffer: sampleBuffer) else { return }
         if (self.startStream){
             //UIImageWriteToSavedPhotosAlbum(uiImage, nil, nil, nil);
-            self.frame_counter = self.frame_counter + 1
             selectedPhotosArray.append(UIImage(named: "\(self.frame_counter).JPG")!)
             //guard let data = uiImage.jpegData(compressionQuality: 1) ?? uiImage.pngData() else {return}
             //let frameKey = "fileName\(self.frame_counter).png"
@@ -266,6 +265,7 @@ class CameraViewController : UIViewController, AVCaptureVideoDataOutputSampleBuf
             //    return 
             //}
             //uploadFile(fileNameKey : frameKey, filename : fileName)
+            self.frame_counter = self.frame_counter + 1
         }
         else{
             startStream = false
