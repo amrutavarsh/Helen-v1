@@ -235,31 +235,22 @@ class CameraViewController : UIViewController, AVCaptureVideoDataOutputSampleBuf
     }
     
     func captureOutput(_ output: AVCaptureOutput, didOutput sampleBuffer: CMSampleBuffer, from connection: AVCaptureConnection) {
-         guard let frame = CMSampleBufferGetImageBuffer(sampleBuffer) else {
-                    return
-                }
-                self.detectFace(in: frame)
+         
+        guard let uiImage = self.imageFromSampleBuffer(sampleBuffer: sampleBuffer) else { return }
         if (self.startStream){
-            guard let uiImage = self.imageFromSampleBuffer(sampleBuffer: sampleBuffer) else { return }
-            UIImageWriteToSavedPhotosAlbum(uiImage, nil, nil, nil);
-                    self.frame_counter = self.frame_counter + 1
-            //uploadData() //needs fixing
-            guard let data = uiImage.jpegData(compressionQuality: 1) ?? uiImage.pngData() else {
-        return
-    }
-
-let frameKey = "fileName\(self.frame_counter).png"
-
-    let fileName = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask)[0].appendingPathComponent(frameKey)
-    do {
-        try data.write(to: fileName)
-//        return
-    } catch {   
-        print(error.localizedDescription)
-        return 
-    }
-              uploadFile(fileNameKey : frameKey, filename : fileName)
+            //UIImageWriteToSavedPhotosAlbum(uiImage, nil, nil, nil);
+            self.frame_counter = self.frame_counter + 1
+            guard let data = uiImage.jpegData(compressionQuality: 1) ?? uiImage.pngData() else {return}
+            let frameKey = "fileName\(self.frame_counter).png"
+            let fileName = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask)[0].appendingPathComponent(frameKey)
+            do {
+                try data.write(to: fileName)
+            } catch {   
+                print(error.localizedDescription)
+                return 
             }
+        uploadFile(fileNameKey : frameKey, filename : fileName)
+        }
         else{
             startStream = false
         }       
@@ -267,7 +258,7 @@ let frameKey = "fileName\(self.frame_counter).png"
     
     func imageFromSampleBuffer(sampleBuffer : CMSampleBuffer) -> UIImage? {
         guard let imageBuffer = CMSampleBufferGetImageBuffer(sampleBuffer) else { return nil }
-        
+        self.detectFace(in: imageBuffer)
         let ciImage = CIImage(cvPixelBuffer: imageBuffer)
         
         guard let cgImage = context.createCGImage(ciImage, from: ciImage.extent) else { return nil }
