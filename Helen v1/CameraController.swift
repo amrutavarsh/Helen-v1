@@ -14,7 +14,7 @@ import Vision
 import AWSS3
 import Amplify
 
-var useAudio:Bool = false
+var useAudio:Bool = true
 
 public enum CameraPosition {
     case front
@@ -124,7 +124,7 @@ class CameraViewController : UIViewController, AVCaptureFileOutputRecordingDeleg
     }
     
     func configureVideoInputs(){
-         self.avSession.sessionPreset = AVCaptureSession.Preset.medium
+         self.avSession.sessionPreset = AVCaptureSession.Preset.hd1280x720
            if let rearCamera = self.rearCamera {
                self.rearCameraInput = try! AVCaptureDeviceInput(device: rearCamera)
                            
