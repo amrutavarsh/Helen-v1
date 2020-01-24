@@ -7,11 +7,8 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
-		05665C044C0592ECADC0EEBA /* Pods_Helen_v1Tests.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = AF15AC302AEFC0887BC04124 /* Pods_Helen_v1Tests.framework */; };
-		961F8CB564E751FEE0723B1C /* Pods_Helen_v1.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = B03C8D60723CE57F0FC32F92 /* Pods_Helen_v1.framework */; };
 		9D69F90E23D6F139002EFC1D /* awsconfiguration.json in Resources */ = {isa = PBXBuildFile; fileRef = 9D69F90D23D6F139002EFC1D /* awsconfiguration.json */; };
 		9D69F91023D704B6002EFC1D /* amplifyconfiguration.json in Resources */ = {isa = PBXBuildFile; fileRef = 9D69F90F23D704B6002EFC1D /* amplifyconfiguration.json */; };
-		B3C116F89867F7E208821DAB /* Pods_Helen_v1UITests.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 97874CC7647955B08ED62228 /* Pods_Helen_v1UITests.framework */; };
 		F40B074023C76D1500CBB9F9 /* CameraController.swift in Sources */ = {isa = PBXBuildFile; fileRef = F40B073F23C76D1500CBB9F9 /* CameraController.swift */; };
 		F40BDACE23C911E100FF033C /* CreatorsInfo.swift in Sources */ = {isa = PBXBuildFile; fileRef = F40BDACD23C911E100FF033C /* CreatorsInfo.swift */; };
 		F4A3B178238EC02500C5CCB0 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = F4A3B177238EC02500C5CCB0 /* AppDelegate.swift */; };
@@ -42,17 +39,8 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
-		12DC8AF98F1949EC31677484 /* Pods-Helen v1UITests.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-Helen v1UITests.release.xcconfig"; path = "Pods/Target Support Files/Pods-Helen v1UITests/Pods-Helen v1UITests.release.xcconfig"; sourceTree = "<group>"; };
-		212852DA8D6C8386ECD140B0 /* Pods-Helen v1.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-Helen v1.release.xcconfig"; path = "Pods/Target Support Files/Pods-Helen v1/Pods-Helen v1.release.xcconfig"; sourceTree = "<group>"; };
-		392591317AAB54D7C6640873 /* Pods-Helen v1Tests.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-Helen v1Tests.debug.xcconfig"; path = "Pods/Target Support Files/Pods-Helen v1Tests/Pods-Helen v1Tests.debug.xcconfig"; sourceTree = "<group>"; };
-		7FD779DB429634600282B19D /* Pods-Helen v1.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-Helen v1.debug.xcconfig"; path = "Pods/Target Support Files/Pods-Helen v1/Pods-Helen v1.debug.xcconfig"; sourceTree = "<group>"; };
-		97874CC7647955B08ED62228 /* Pods_Helen_v1UITests.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_Helen_v1UITests.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		9D69F90D23D6F139002EFC1D /* awsconfiguration.json */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.json; path = awsconfiguration.json; sourceTree = SOURCE_ROOT; };
 		9D69F90F23D704B6002EFC1D /* amplifyconfiguration.json */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.json; path = amplifyconfiguration.json; sourceTree = SOURCE_ROOT; };
-		AF15AC302AEFC0887BC04124 /* Pods_Helen_v1Tests.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_Helen_v1Tests.framework; sourceTree = BUILT_PRODUCTS_DIR; };
-		B03C8D60723CE57F0FC32F92 /* Pods_Helen_v1.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_Helen_v1.framework; sourceTree = BUILT_PRODUCTS_DIR; };
-		C85249F8A0B5C70236937A8B /* Pods-Helen v1Tests.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-Helen v1Tests.release.xcconfig"; path = "Pods/Target Support Files/Pods-Helen v1Tests/Pods-Helen v1Tests.release.xcconfig"; sourceTree = "<group>"; };
-		CEA129BFD066C17C88D04158 /* Pods-Helen v1UITests.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-Helen v1UITests.debug.xcconfig"; path = "Pods/Target Support Files/Pods-Helen v1UITests/Pods-Helen v1UITests.debug.xcconfig"; sourceTree = "<group>"; };
 		F40B073F23C76D1500CBB9F9 /* CameraController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CameraController.swift; sourceTree = "<group>"; };
 		F40BDACD23C911E100FF033C /* CreatorsInfo.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CreatorsInfo.swift; sourceTree = "<group>"; };
 		F48C08E023CC47150006ED6C /* Helen v1.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = "Helen v1.entitlements"; sourceTree = "<group>"; };
@@ -77,7 +65,6 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				961F8CB564E751FEE0723B1C /* Pods_Helen_v1.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -85,7 +72,6 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				05665C044C0592ECADC0EEBA /* Pods_Helen_v1Tests.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -93,36 +79,12 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				B3C116F89867F7E208821DAB /* Pods_Helen_v1UITests.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
-		350F89B555E9538C00205821 /* Frameworks */ = {
-			isa = PBXGroup;
-			children = (
-				B03C8D60723CE57F0FC32F92 /* Pods_Helen_v1.framework */,
-				AF15AC302AEFC0887BC04124 /* Pods_Helen_v1Tests.framework */,
-				97874CC7647955B08ED62228 /* Pods_Helen_v1UITests.framework */,
-			);
-			name = Frameworks;
-			sourceTree = "<group>";
-		};
-		56E8B54F825F91F2B0D57644 /* Pods */ = {
-			isa = PBXGroup;
-			children = (
-				7FD779DB429634600282B19D /* Pods-Helen v1.debug.xcconfig */,
-				212852DA8D6C8386ECD140B0 /* Pods-Helen v1.release.xcconfig */,
-				392591317AAB54D7C6640873 /* Pods-Helen v1Tests.debug.xcconfig */,
-				C85249F8A0B5C70236937A8B /* Pods-Helen v1Tests.release.xcconfig */,
-				CEA129BFD066C17C88D04158 /* Pods-Helen v1UITests.debug.xcconfig */,
-				12DC8AF98F1949EC31677484 /* Pods-Helen v1UITests.release.xcconfig */,
-			);
-			name = Pods;
-			sourceTree = "<group>";
-		};
 		F4A3B16B238EC02500C5CCB0 = {
 			isa = PBXGroup;
 			children = (
@@ -130,8 +92,6 @@
 				F4A3B18D238EC02B00C5CCB0 /* Helen v1Tests */,
 				F4A3B198238EC02B00C5CCB0 /* Helen v1UITests */,
 				F4A3B175238EC02500C5CCB0 /* Products */,
-				56E8B54F825F91F2B0D57644 /* Pods */,
-				350F89B555E9538C00205821 /* Frameworks */,
 			);
 			sourceTree = "<group>";
 		};
@@ -197,11 +157,9 @@
 			isa = PBXNativeTarget;
 			buildConfigurationList = F4A3B19E238EC02B00C5CCB0 /* Build configuration list for PBXNativeTarget "Helen v1" */;
 			buildPhases = (
-				FD421FB6DF79ED9B285FEEAA /* [CP] Check Pods Manifest.lock */,
 				F4A3B170238EC02500C5CCB0 /* Sources */,
 				F4A3B171238EC02500C5CCB0 /* Frameworks */,
 				F4A3B172238EC02500C5CCB0 /* Resources */,
-				D04DB3948E0D93559EC29C83 /* [CP] Embed Pods Frameworks */,
 			);
 			buildRules = (
 			);
@@ -216,7 +174,6 @@
 			isa = PBXNativeTarget;
 			buildConfigurationList = F4A3B1A1238EC02B00C5CCB0 /* Build configuration list for PBXNativeTarget "Helen v1Tests" */;
 			buildPhases = (
-				DFB7285A99B7F336D87F4EC5 /* [CP] Check Pods Manifest.lock */,
 				F4A3B186238EC02B00C5CCB0 /* Sources */,
 				F4A3B187238EC02B00C5CCB0 /* Frameworks */,
 				F4A3B188238EC02B00C5CCB0 /* Resources */,
@@ -235,7 +192,6 @@
 			isa = PBXNativeTarget;
 			buildConfigurationList = F4A3B1A4238EC02B00C5CCB0 /* Build configuration list for PBXNativeTarget "Helen v1UITests" */;
 			buildPhases = (
-				2FAF49C4CB1113318BBB5D36 /* [CP] Check Pods Manifest.lock */,
 				F4A3B191238EC02B00C5CCB0 /* Sources */,
 				F4A3B192238EC02B00C5CCB0 /* Frameworks */,
 				F4A3B193238EC02B00C5CCB0 /* Resources */,
@@ -321,105 +277,6 @@
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 /* End PBXResourcesBuildPhase section */
-
-/* Begin PBXShellScriptBuildPhase section */
-		2FAF49C4CB1113318BBB5D36 /* [CP] Check Pods Manifest.lock */ = {
-			isa = PBXShellScriptBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-			);
-			inputPaths = (
-				"${PODS_PODFILE_DIR_PATH}/Podfile.lock",
-				"${PODS_ROOT}/Manifest.lock",
-			);
-			name = "[CP] Check Pods Manifest.lock";
-			outputPaths = (
-				"$(DERIVED_FILE_DIR)/Pods-Helen v1UITests-checkManifestLockResult.txt",
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-			shellPath = /bin/sh;
-			shellScript = "diff \"${PODS_PODFILE_DIR_PATH}/Podfile.lock\" \"${PODS_ROOT}/Manifest.lock\" > /dev/null\nif [ $? != 0 ] ; then\n    # print error to STDERR\n    echo \"error: The sandbox is not in sync with the Podfile.lock. Run 'pod install' or update your CocoaPods installation.\" >&2\n    exit 1\nfi\n# This output is used by Xcode 'outputs' to avoid re-running this script phase.\necho \"SUCCESS\" > \"${SCRIPT_OUTPUT_FILE_0}\"\n";
-			showEnvVarsInLog = 0;
-		};
-		D04DB3948E0D93559EC29C83 /* [CP] Embed Pods Frameworks */ = {
-			isa = PBXShellScriptBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-			);
-			inputPaths = (
-				"${SRCROOT}/Pods/Target Support Files/Pods-Helen v1/Pods-Helen v1-frameworks.sh",
-				"${BUILT_PRODUCTS_DIR}/AWSAppSync/AWSAppSync.framework",
-				"${BUILT_PRODUCTS_DIR}/AWSAuthCore/AWSAuthCore.framework",
-				"${BUILT_PRODUCTS_DIR}/AWSCognitoIdentityProvider/AWSCognitoIdentityProvider.framework",
-				"${BUILT_PRODUCTS_DIR}/AWSCognitoIdentityProviderASF/AWSCognitoIdentityProviderASF.framework",
-				"${BUILT_PRODUCTS_DIR}/AWSCore/AWSCore.framework",
-				"${BUILT_PRODUCTS_DIR}/AWSMobileClient/AWSMobileClient.framework",
-				"${BUILT_PRODUCTS_DIR}/AWSPluginsCore/AWSPluginsCore.framework",
-				"${BUILT_PRODUCTS_DIR}/AWSS3/AWSS3.framework",
-				"${BUILT_PRODUCTS_DIR}/Amplify/Amplify.framework",
-				"${BUILT_PRODUCTS_DIR}/AmplifyPlugins/AmplifyPlugins.framework",
-				"${BUILT_PRODUCTS_DIR}/ReachabilitySwift/Reachability.framework",
-				"${BUILT_PRODUCTS_DIR}/SQLite.swift/SQLite.framework",
-				"${BUILT_PRODUCTS_DIR}/Starscream/Starscream.framework",
-			);
-			name = "[CP] Embed Pods Frameworks";
-			outputPaths = (
-				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/AWSAppSync.framework",
-				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/AWSAuthCore.framework",
-				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/AWSCognitoIdentityProvider.framework",
-				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/AWSCognitoIdentityProviderASF.framework",
-				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/AWSCore.framework",
-				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/AWSMobileClient.framework",
-				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/AWSPluginsCore.framework",
-				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/AWSS3.framework",
-				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/Amplify.framework",
-				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/AmplifyPlugins.framework",
-				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/Reachability.framework",
-				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/SQLite.framework",
-				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/Starscream.framework",
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-			shellPath = /bin/sh;
-			shellScript = "\"${SRCROOT}/Pods/Target Support Files/Pods-Helen v1/Pods-Helen v1-frameworks.sh\"\n";
-			showEnvVarsInLog = 0;
-		};
-		DFB7285A99B7F336D87F4EC5 /* [CP] Check Pods Manifest.lock */ = {
-			isa = PBXShellScriptBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-			);
-			inputPaths = (
-				"${PODS_PODFILE_DIR_PATH}/Podfile.lock",
-				"${PODS_ROOT}/Manifest.lock",
-			);
-			name = "[CP] Check Pods Manifest.lock";
-			outputPaths = (
-				"$(DERIVED_FILE_DIR)/Pods-Helen v1Tests-checkManifestLockResult.txt",
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-			shellPath = /bin/sh;
-			shellScript = "diff \"${PODS_PODFILE_DIR_PATH}/Podfile.lock\" \"${PODS_ROOT}/Manifest.lock\" > /dev/null\nif [ $? != 0 ] ; then\n    # print error to STDERR\n    echo \"error: The sandbox is not in sync with the Podfile.lock. Run 'pod install' or update your CocoaPods installation.\" >&2\n    exit 1\nfi\n# This output is used by Xcode 'outputs' to avoid re-running this script phase.\necho \"SUCCESS\" > \"${SCRIPT_OUTPUT_FILE_0}\"\n";
-			showEnvVarsInLog = 0;
-		};
-		FD421FB6DF79ED9B285FEEAA /* [CP] Check Pods Manifest.lock */ = {
-			isa = PBXShellScriptBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-			);
-			inputPaths = (
-				"${PODS_PODFILE_DIR_PATH}/Podfile.lock",
-				"${PODS_ROOT}/Manifest.lock",
-			);
-			name = "[CP] Check Pods Manifest.lock";
-			outputPaths = (
-				"$(DERIVED_FILE_DIR)/Pods-Helen v1-checkManifestLockResult.txt",
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-			shellPath = /bin/sh;
-			shellScript = "diff \"${PODS_PODFILE_DIR_PATH}/Podfile.lock\" \"${PODS_ROOT}/Manifest.lock\" > /dev/null\nif [ $? != 0 ] ; then\n    # print error to STDERR\n    echo \"error: The sandbox is not in sync with the Podfile.lock. Run 'pod install' or update your CocoaPods installation.\" >&2\n    exit 1\nfi\n# This output is used by Xcode 'outputs' to avoid re-running this script phase.\necho \"SUCCESS\" > \"${SCRIPT_OUTPUT_FILE_0}\"\n";
-			showEnvVarsInLog = 0;
-		};
-/* End PBXShellScriptBuildPhase section */
 
 /* Begin PBXSourcesBuildPhase section */
 		F4A3B170238EC02500C5CCB0 /* Sources */ = {
@@ -593,7 +450,6 @@
 		};
 		F4A3B19F238EC02B00C5CCB0 /* Debug */ = {
 			isa = XCBuildConfiguration;
-			baseConfigurationReference = 7FD779DB429634600282B19D /* Pods-Helen v1.debug.xcconfig */;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CODE_SIGN_ENTITLEMENTS = "Helen v1/Helen v1.entitlements";
@@ -616,7 +472,6 @@
 		};
 		F4A3B1A0238EC02B00C5CCB0 /* Release */ = {
 			isa = XCBuildConfiguration;
-			baseConfigurationReference = 212852DA8D6C8386ECD140B0 /* Pods-Helen v1.release.xcconfig */;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CODE_SIGN_ENTITLEMENTS = "Helen v1/Helen v1.entitlements";
@@ -639,7 +494,6 @@
 		};
 		F4A3B1A2238EC02B00C5CCB0 /* Debug */ = {
 			isa = XCBuildConfiguration;
-			baseConfigurationReference = 392591317AAB54D7C6640873 /* Pods-Helen v1Tests.debug.xcconfig */;
 			buildSettings = {
 				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
 				BUNDLE_LOADER = "$(TEST_HOST)";
@@ -661,7 +515,6 @@
 		};
 		F4A3B1A3238EC02B00C5CCB0 /* Release */ = {
 			isa = XCBuildConfiguration;
-			baseConfigurationReference = C85249F8A0B5C70236937A8B /* Pods-Helen v1Tests.release.xcconfig */;
 			buildSettings = {
 				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
 				BUNDLE_LOADER = "$(TEST_HOST)";
@@ -683,7 +536,6 @@
 		};
 		F4A3B1A5238EC02B00C5CCB0 /* Debug */ = {
 			isa = XCBuildConfiguration;
-			baseConfigurationReference = CEA129BFD066C17C88D04158 /* Pods-Helen v1UITests.debug.xcconfig */;
 			buildSettings = {
 				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
 				CODE_SIGN_STYLE = Automatic;
@@ -703,7 +555,6 @@
 		};
 		F4A3B1A6238EC02B00C5CCB0 /* Release */ = {
 			isa = XCBuildConfiguration;
-			baseConfigurationReference = 12DC8AF98F1949EC31677484 /* Pods-Helen v1UITests.release.xcconfig */;
 			buildSettings = {
 				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
 				CODE_SIGN_STYLE = Automatic;

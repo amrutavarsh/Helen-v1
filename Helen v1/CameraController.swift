@@ -35,30 +35,31 @@ struct CameraView : UIViewControllerRepresentable {
     
     func callSwitchCam() {controller.switchCamera()}
     func toggleStartStream() {
-        controller.startStream.toggle()
-//        controller.upload()
+        if controller.startStream == false{
+            controller.startRecording()
+            controller.startStream = true
+        }
+        else{
+            controller.stopRecording()
+            controller.startStream = false
+        }
     }
     func faceFound()-> Bool{return controller.frameFaceFound}
     
 }
 
-class CameraViewController : UIViewController, AVCaptureVideoDataOutputSampleBufferDelegate {
-    func fileOutput(_ output: AVCaptureFileOutput, didFinishRecordingTo outputFileURL: URL, from connections: [AVCaptureConnection], error: Error?) {
-        //nothing
-    }
+class CameraViewController : UIViewController, AVCaptureFileOutputRecordingDelegate {
     
     var startStream = false
-    var prevStartStream = false
     var frame_counter = 1
     var videoID = 1
     var frameFaceFound: Bool = true
     
-    var videoDataOutput: AVCaptureVideoDataOutput!
-    var videoDataOutputQueue: DispatchQueue!
-    
     var avSession: AVCaptureSession!
     
     var currentCameraPosition: CameraPosition?
+    
+    let movieOutput = AVCaptureMovieFileOutput()
     
     var frontCamera: AVCaptureDevice?
     var frontCameraInput: AVCaptureDeviceInput?
@@ -66,18 +67,10 @@ class CameraViewController : UIViewController, AVCaptureVideoDataOutputSampleBuf
     var rearCamera: AVCaptureDevice?
     var rearCameraInput: AVCaptureDeviceInput?
     
-    var audioDevice :AVCaptureDevice?
-    var captureAudioInput :AVCaptureDeviceInput?
-    var captureDeviceAudioFound:Bool = false
-    
     var cameraPreview :AVCaptureVideoPreviewLayer?
     
     let context =  CIContext()
-    let outputSize = CGSize(width: 1920, height: 1280)
-    let imagesPerSecond: TimeInterval = 0.04 //each image will be stay for 3 secs
-    var selectedPhotosArray = [UIImage]()
-    var imageArrayToVideoURL: URL!
-    var asset: AVAsset!
+    var outputURL: URL!
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -131,54 +124,46 @@ class CameraViewController : UIViewController, AVCaptureVideoDataOutputSampleBuf
     }
     
     func configureVideoInputs(){
-        guard let captureSession = self.avSession else { return }
-        if let rearCamera = self.rearCamera {
-            self.rearCameraInput = try! AVCaptureDeviceInput(device: rearCamera)
-                        
-            if captureSession.canAddInput(self.rearCameraInput!) {
-                captureSession.addInput(self.rearCameraInput!)
-            }
-            
-            self.currentCameraPosition = .rear
-        }
-            
-        else if let frontCamera = self.frontCamera {
-            self.frontCameraInput = try! AVCaptureDeviceInput(device: frontCamera)
-            
-            if captureSession.canAddInput(self.frontCameraInput!){
-                captureSession.addInput(self.frontCameraInput!)
-            }
-            else { return }
-            
-            self.currentCameraPosition = .front
-        }
+         self.avSession.sessionPreset = AVCaptureSession.Preset.medium
+           if let rearCamera = self.rearCamera {
+               self.rearCameraInput = try! AVCaptureDeviceInput(device: rearCamera)
+                           
+               if self.avSession.canAddInput(self.rearCameraInput!) {
+                   self.avSession.addInput(self.rearCameraInput!)
+               }
+               
+               self.currentCameraPosition = .rear
+           }
+               
+           else if let frontCamera = self.frontCamera {
+               self.frontCameraInput = try! AVCaptureDeviceInput(device: frontCamera)
+               
+               if self.avSession.canAddInput(self.frontCameraInput!){
+                   self.avSession.addInput(self.frontCameraInput!)
+               }
+               else { return }
+               
+               self.currentCameraPosition = .front
+           }
     }
     
     func configureVideoOutput(){
-        videoDataOutput = AVCaptureVideoDataOutput()
-        videoDataOutput.alwaysDiscardsLateVideoFrames=true
-        videoDataOutputQueue = DispatchQueue(label: "VideoDataOutputQueue")
-        videoDataOutput.setSampleBufferDelegate(self, queue:self.videoDataOutputQueue)
-        
-        if avSession.canAddOutput(self.videoDataOutput){
-            avSession.addOutput(self.videoDataOutput)
+        if self.avSession.canAddOutput(movieOutput) {
+            self.avSession.addOutput(movieOutput)
         }
-        
-        videoDataOutput.connection(with: .video)?.isEnabled = true
     }
     
     func configureAudioInputs(){
-        do{
-            self.audioDevice = AVCaptureDevice.default(for: .audio)
-            self.captureAudioInput = try AVCaptureDeviceInput(device: audioDevice!)
-            if avSession!.canAddInput(captureAudioInput!) {
-                avSession!.addInput(captureAudioInput!)
-            } else {
-                print("Could not add audio device input to the session")
+        let microphone = AVCaptureDevice.default(for: AVMediaType.audio)!
+
+        do {
+            let micInput = try AVCaptureDeviceInput(device: microphone)
+            if self.avSession.canAddInput(micInput) {
+                self.avSession.addInput(micInput)
             }
-        }
-        catch{
-            print("Could not create audio device input")
+        } catch {
+            print("Error setting device audio input: \(error)")
+            return
         }
     }
     
@@ -254,104 +239,48 @@ class CameraViewController : UIViewController, AVCaptureVideoDataOutputSampleBuf
         guard let uiImage = self.imageFromSampleBuffer(sampleBuffer: sampleBuffer) else { return }
         if (self.startStream){
             //UIImageWriteToSavedPhotosAlbum(uiImage, nil, nil, nil);
-            selectedPhotosArray.append(uiImage)
-            //guard let data = uiImage.jpegData(compressionQuality: 1) ?? uiImage.pngData() else {return}
-            //let frameKey = "fileName\(self.frame_counter).png"
-            //let fileName = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask)[0].appendingPathComponent(frameKey)
-            //do {
-            //    try data.write(to: fileName)
-            //} catch {   
-            //    print(error.localizedDescription)
-            //    return 
-            //}
             //uploadFile(fileNameKey : frameKey, filename : fileName)
             self.frame_counter = self.frame_counter + 1
         }
-        else{
-            startStream = false
-            if prevStartStream == true{
-            buildVideoFromImageArray()
-            }    
-        }
-        prevStartStream = startStream
     }
     
-    func buildVideoFromImageArray() {
-        let fileKey = "file\(videoID).MP4"
-        videoID += 1
-        imageArrayToVideoURL = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask)[0].appendingPathComponent(fileKey)
-        guard let videoWriter = try? AVAssetWriter(outputURL: imageArrayToVideoURL as URL, fileType: AVFileType.mp4) else {
-            fatalError("AVAssetWriter error")
-        }
-        let outputSettings = [AVVideoCodecKey : AVVideoCodecType.h264, AVVideoWidthKey : NSNumber(value: Float(outputSize.width)), AVVideoHeightKey : NSNumber(value: Float(outputSize.height))] as [String : Any]
-        guard videoWriter.canApply(outputSettings: outputSettings, forMediaType: AVMediaType.video) else {
-            fatalError("Negative : Can't apply the Output settings...")
-        }
-        let videoWriterInput = AVAssetWriterInput(mediaType: AVMediaType.video, outputSettings: outputSettings)
-        let sourcePixelBufferAttributesDictionary = [kCVPixelBufferPixelFormatTypeKey as String : NSNumber(value: kCVPixelFormatType_32ARGB), kCVPixelBufferWidthKey as String: NSNumber(value: Float(outputSize.width)), kCVPixelBufferHeightKey as String: NSNumber(value: Float(outputSize.height))]
-        let pixelBufferAdaptor = AVAssetWriterInputPixelBufferAdaptor(assetWriterInput: videoWriterInput, sourcePixelBufferAttributes: sourcePixelBufferAttributesDictionary)
-        if videoWriter.canAdd(videoWriterInput) {
-            videoWriter.add(videoWriterInput)
-        }
-        if videoWriter.startWriting() {
-            let zeroTime = CMTimeMake(value: Int64(imagesPerSecond),timescale: Int32(1))
-            videoWriter.startSession(atSourceTime: zeroTime)
+    func startRecording() {
 
-            assert(pixelBufferAdaptor.pixelBufferPool != nil)
-            let media_queue = DispatchQueue(label: "mediaInputQueue")
-            videoWriterInput.requestMediaDataWhenReady(on: media_queue, using: { () -> Void in
-                let fps: Int32 = 1
-                let framePerSecond: Int64 = Int64(self.imagesPerSecond)
-                let frameDuration = CMTimeMake(value: Int64(self.imagesPerSecond), timescale: fps)
-                var frameCount: Int64 = 0
-                var appendSucceeded = true
-                while (!self.selectedPhotosArray.isEmpty) {
-                    if (videoWriterInput.isReadyForMoreMediaData) {
-                        let nextPhoto = self.selectedPhotosArray.remove(at: 0)
-                        let lastFrameTime = CMTimeMake(value: frameCount * framePerSecond, timescale: fps)
-                        let presentationTime = frameCount == 0 ? lastFrameTime : CMTimeAdd(lastFrameTime, frameDuration)
-                        var pixelBuffer: CVPixelBuffer? = nil
-                        let status: CVReturn = CVPixelBufferPoolCreatePixelBuffer(kCFAllocatorDefault, pixelBufferAdaptor.pixelBufferPool!, &pixelBuffer)
-                        if let pixelBuffer = pixelBuffer, status == 0 {
-                            let managedPixelBuffer = pixelBuffer
-                            CVPixelBufferLockBaseAddress(managedPixelBuffer, CVPixelBufferLockFlags(rawValue: CVOptionFlags(0)))
-                            let data = CVPixelBufferGetBaseAddress(managedPixelBuffer)
-                            let rgbColorSpace = CGColorSpaceCreateDeviceRGB()
-                            let context = CGContext(data: data, width: Int(self.outputSize.width), height: Int(self.outputSize.height), bitsPerComponent: 8, bytesPerRow: CVPixelBufferGetBytesPerRow(managedPixelBuffer), space: rgbColorSpace, bitmapInfo: CGImageAlphaInfo.premultipliedFirst.rawValue)
-                            context!.clear(CGRect(x: 0, y: 0, width: CGFloat(self.outputSize.width), height: CGFloat(self.outputSize.height)))
-                            let horizontalRatio = CGFloat(self.outputSize.width) / nextPhoto.size.width
-                            let verticalRatio = CGFloat(self.outputSize.height) / nextPhoto.size.height
-                            //let aspectRatio = max(horizontalRatio, verticalRatio) // ScaleAspectFill
-                            let aspectRatio = min(horizontalRatio, verticalRatio) // ScaleAspectFit
-                            let newSize: CGSize = CGSize(width: nextPhoto.size.width * aspectRatio, height: nextPhoto.size.height * aspectRatio)
-                            let x = newSize.width < self.outputSize.width ? (self.outputSize.width - newSize.width) / 2 : 0
-                            let y = newSize.height < self.outputSize.height ? (self.outputSize.height - newSize.height) / 2 : 0
-                            context?.draw(nextPhoto.cgImage!, in: CGRect(x: x, y: y, width: newSize.width, height: newSize.height))
-                            CVPixelBufferUnlockBaseAddress(managedPixelBuffer, CVPixelBufferLockFlags(rawValue: CVOptionFlags(0)))
-                            appendSucceeded = pixelBufferAdaptor.append(pixelBuffer, withPresentationTime: presentationTime)
-                        } else {
-                            print("Failed to allocate pixel buffer")
-                            appendSucceeded = false
-                        }
-                    }
-                    if !appendSucceeded {
-                        break
-                    }
-                    frameCount += 1
-                }
-                videoWriterInput.markAsFinished()
-                videoWriter.finishWriting { () -> Void in
-                    print("-----video1 url = \(String(describing: self.imageArrayToVideoURL))")
-                    self.asset = AVAsset(url: self.imageArrayToVideoURL as URL)
-                }
-            })
+        if movieOutput.isRecording == false {
+            print("recording \(videoID) started")
+            let connection = movieOutput.connection(with: AVMediaType.video)
+
+            if (connection?.isVideoOrientationSupported)! {
+                connection?.videoOrientation = AVCaptureVideoOrientation.portrait
+            }
+
+            if (connection?.isVideoStabilizationSupported)! {
+                connection?.preferredVideoStabilizationMode = AVCaptureVideoStabilizationMode.auto
+            }
+            outputURL = getURL()
+            movieOutput.startRecording(to: outputURL, recordingDelegate: self)
         }
-        uploadFile(fileNameKey: fileKey, filename: imageArrayToVideoURL as URL)
+        else {
+            stopRecording()
+        }
+
     }
     
-    func getDocumentsDirectory() -> URL {
-        let paths = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask)
-        return paths[0]
+    func stopRecording() {
+        if movieOutput.isRecording == true {
+            movieOutput.stopRecording()
+        }
+        print("recording \(videoID) ended")
+        uploadFile(fileNameKey : "HelenVideo\(videoID).mp4", filename : outputURL)
+        videoID += 1
+    }
+    
+    func fileOutput(_ output: AVCaptureFileOutput, didFinishRecordingTo outputFileURL: URL, from connections: [AVCaptureConnection], error: Error?) {
+    }
+    
+    func getURL() -> URL {
+        let path = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask)[0].appendingPathComponent("HelenVideo\(videoID).mp4")
+        return path
     }
     
     func stopCamera(){
