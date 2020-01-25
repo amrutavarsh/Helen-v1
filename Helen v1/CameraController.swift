@@ -290,7 +290,7 @@ class CameraViewController : UIViewController, AVCaptureFileOutputRecordingDeleg
     //aws stuff
     
     func uploadData() {
-        print("called")
+        print("called upload Data")
         let dataString = "My Data"
         let data = dataString.data(using: .utf8)!
         Amplify.Storage.uploadData(key: "myKey", data: data) { (event) in
