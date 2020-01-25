@@ -14,7 +14,7 @@ import Vision
 import AWSS3
 import Amplify
 
-var useAudio:Bool = true
+var useAudio:Bool = false
 
 public enum CameraPosition {
     case front
@@ -36,11 +36,11 @@ struct CameraView : UIViewControllerRepresentable {
     func callSwitchCam() {controller.switchCamera()}
     func toggleStartStream() {
         if controller.startStream == false{
-            controller.startRecording()
+            //controller.startRecording()
             controller.startStream = true
         }
         else{
-            controller.stopRecording()
+            //controller.stopRecording()
             controller.startStream = false
         }
     }
@@ -48,7 +48,7 @@ struct CameraView : UIViewControllerRepresentable {
     
 }
 
-class CameraViewController : UIViewController, AVCaptureFileOutputRecordingDelegate {
+class CameraViewController : UIViewController, AVCaptureFileOutputRecordingDelegate, AVCaptureVideoDataOutputSampleBufferDelegate {
     
     var startStream = false
     var frame_counter = 1
@@ -124,7 +124,6 @@ class CameraViewController : UIViewController, AVCaptureFileOutputRecordingDeleg
     }
     
     func configureVideoInputs(){
-         self.avSession.sessionPreset = AVCaptureSession.Preset.hd1280x720
            if let rearCamera = self.rearCamera {
                self.rearCameraInput = try! AVCaptureDeviceInput(device: rearCamera)
                            
@@ -148,14 +147,23 @@ class CameraViewController : UIViewController, AVCaptureFileOutputRecordingDeleg
     }
     
     func configureVideoOutput(){
-        if self.avSession.canAddOutput(movieOutput) {
-            self.avSession.addOutput(movieOutput)
+//        if self.avSession.canAddOutput(movieOutput) {
+//            self.avSession.addOutput(movieOutput)
+//        }
+        let videoDataOutput = AVCaptureVideoDataOutput()
+        videoDataOutput.alwaysDiscardsLateVideoFrames=true
+        let videoDataOutputQueue = DispatchQueue(label: "VideoDataOutputQueue")
+        videoDataOutput.setSampleBufferDelegate(self, queue:videoDataOutputQueue)
+        
+        if avSession.canAddOutput(videoDataOutput){
+            avSession.addOutput(videoDataOutput)
         }
+        
+        videoDataOutput.connection(with: .video)?.isEnabled = true
     }
     
     func configureAudioInputs(){
         let microphone = AVCaptureDevice.default(for: AVMediaType.audio)!
-
         do {
             let micInput = try AVCaptureDeviceInput(device: microphone)
             if self.avSession.canAddInput(micInput) {
@@ -239,8 +247,24 @@ class CameraViewController : UIViewController, AVCaptureFileOutputRecordingDeleg
         guard let uiImage = self.imageFromSampleBuffer(sampleBuffer: sampleBuffer) else { return }
         if (self.startStream){
             //UIImageWriteToSavedPhotosAlbum(uiImage, nil, nil, nil);
-            //uploadFile(fileNameKey : frameKey, filename : fileName)
             self.frame_counter = self.frame_counter + 1
+            guard let data = uiImage.jpegData(compressionQuality: 1) ?? uiImage.pngData() else {return}
+            let frameKey = "fileName\(self.frame_counter).png"
+            let fileName = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask)[0].appendingPathComponent(frameKey)
+            DispatchQueue.main.async {
+                do {
+                    try data.write(to: fileName)
+                } catch {
+                    print(error.localizedDescription)
+                    return
+                }
+                self.uploadFile(fileNameKey : frameKey, filename : fileName)
+                print("\(self.frame_counter) file uploaded")
+            }
+            print("\(self.frame_counter)")
+        }
+        else{
+            self.startStream = false
         }
     }
     
