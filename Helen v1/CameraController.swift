@@ -45,6 +45,7 @@ struct CameraView : UIViewControllerRepresentable {
         }
     }
     func faceFound()-> Bool{return controller.frameFaceFound}
+    func streamState()-> Bool{return controller.startStream}
     
 }
 
@@ -53,7 +54,7 @@ class CameraViewController : UIViewController, AVCaptureFileOutputRecordingDeleg
     var startStream = false
     var frame_counter = 1
     var videoID = 1
-    var frameFaceFound: Bool = true
+    var frameFaceFound: Bool = false
     
     var avSession: AVCaptureSession!
     
@@ -68,6 +69,7 @@ class CameraViewController : UIViewController, AVCaptureFileOutputRecordingDeleg
     var rearCameraInput: AVCaptureDeviceInput?
     
     var cameraPreview :AVCaptureVideoPreviewLayer?
+    let streamQueue = DispatchQueue.main
     
     let context =  CIContext()
     var outputURL: URL!
@@ -154,12 +156,17 @@ class CameraViewController : UIViewController, AVCaptureFileOutputRecordingDeleg
         videoDataOutput.alwaysDiscardsLateVideoFrames=true
         let videoDataOutputQueue = DispatchQueue(label: "VideoDataOutputQueue")
         videoDataOutput.setSampleBufferDelegate(self, queue:videoDataOutputQueue)
+        videoDataOutput.videoSettings = [
+            String(kCVPixelBufferPixelFormatTypeKey):
+            NSNumber(value: kCVPixelFormatType_32BGRA)
+        ]
         
         if avSession.canAddOutput(videoDataOutput){
             avSession.addOutput(videoDataOutput)
         }
-        
-        videoDataOutput.connection(with: .video)?.isEnabled = true
+        guard let connection = videoDataOutput.connection(with: AVMediaType.video),
+            connection.isVideoOrientationSupported else { return }
+        connection.videoOrientation = .portrait
     }
     
     func configureAudioInputs(){
@@ -220,52 +227,50 @@ class CameraViewController : UIViewController, AVCaptureFileOutputRecordingDeleg
         avSession.commitConfiguration()
     }
     
-    private func detectFace(in image: CVPixelBuffer) {
-        let faceDetectionRequest = VNDetectFaceLandmarksRequest(completionHandler: { (request: VNRequest, error: Error?) in
+    func handleFaceDetect(rect: CGRect, image: CVPixelBuffer){
+        let ciImage = CIImage(cvPixelBuffer: image)
+        var cgImage = context.createCGImage(ciImage, from: ciImage.extent)
+        print(rect.height)
+        cgImage = cgImage?.cropping(to: rect)
+        streamQueue.async {
+        let uiImage = UIImage(cgImage: cgImage!)
+        UIImageWriteToSavedPhotosAlbum(uiImage, nil, nil, nil)
+//        guard let data = uiImage.jpegData(compressionQuality: 1) ?? uiImage.pngData() else {return}
+//        let frameKey = "fileName\(self.frame_counter).png"
+//        let fileName = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask)[0].appendingPathComponent(frameKey)
+//            do {
+//                try data.write(to: fileName)
+//            } catch {
+//                print(error.localizedDescription)
+//                return
+//            }
+//            self.uploadFile(fileNameKey : frameKey, filename : fileName)
+            print("\(self.frame_counter) file uploaded")
+        }
+    }
+    
+    private func detectFace(in image: CVPixelBuffer){
+        let faceDetectionRequest = VNDetectFaceRectanglesRequest(completionHandler: { (request: VNRequest, error: Error?) in
             DispatchQueue.main.async {
                 if let results = request.results as? [VNFaceObservation], results.count > 0 {
+                    print("face found")
                     self.frameFaceFound = true
+                    if(self.startStream){self.handleFaceDetect(rect: results[0].boundingBox, image: image)}
                 } else {
-                    self.frameFaceFound = false                }
+                    print("face not found")
+                    self.frameFaceFound = false
+                    self.startStream = false
+                }
             }
         })
         let imageRequestHandler = VNImageRequestHandler(cvPixelBuffer: image, orientation: .leftMirrored, options: [:])
         try? imageRequestHandler.perform([faceDetectionRequest])
     }
     
-    func imageFromSampleBuffer(sampleBuffer : CMSampleBuffer) -> UIImage? {
-        guard let imageBuffer = CMSampleBufferGetImageBuffer(sampleBuffer) else { return nil }
-        self.detectFace(in: imageBuffer)
-        let ciImage = CIImage(cvPixelBuffer: imageBuffer)
-        
-        guard let cgImage = context.createCGImage(ciImage, from: ciImage.extent) else { return nil }
-        return UIImage(cgImage: cgImage)
-    }
-    
     func captureOutput(_ output: AVCaptureOutput, didOutput sampleBuffer: CMSampleBuffer, from connection: AVCaptureConnection) {
-         
-        guard let uiImage = self.imageFromSampleBuffer(sampleBuffer: sampleBuffer) else { return }
-        if (self.startStream){
-            //UIImageWriteToSavedPhotosAlbum(uiImage, nil, nil, nil);
-            self.frame_counter = self.frame_counter + 1
-            guard let data = uiImage.jpegData(compressionQuality: 1) ?? uiImage.pngData() else {return}
-            let frameKey = "fileName\(self.frame_counter).png"
-            let fileName = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask)[0].appendingPathComponent(frameKey)
-            DispatchQueue.main.async {
-                do {
-                    try data.write(to: fileName)
-                } catch {
-                    print(error.localizedDescription)
-                    return
-                }
-                self.uploadFile(fileNameKey : frameKey, filename : fileName)
-                print("\(self.frame_counter) file uploaded")
-            }
-            print("\(self.frame_counter)")
-        }
-        else{
-            self.startStream = false
-        }
+        let imageBuffer = CMSampleBufferGetImageBuffer(sampleBuffer)
+        self.detectFace(in: imageBuffer!)
+        frame_counter += 1
     }
     
     func startRecording() {
