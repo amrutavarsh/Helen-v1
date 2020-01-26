@@ -293,7 +293,6 @@ class CameraViewController : UIViewController, AVCaptureFileOutputRecordingDeleg
 //        }
         self.uploadFile(fileNameKey : "HelenVideo\(videoID).mp4", filename : self.outputURL)
         print("file uploaded initiated")
-        self.downloadFile()
         
     }
     
@@ -316,6 +315,7 @@ class CameraViewController : UIViewController, AVCaptureFileOutputRecordingDeleg
             switch event {
             case .completed(let data):
                 print("Completed: \(data)")
+                self.downloadFile()
             case .failed(let storageError):
                 print("Failed: \(storageError.errorDescription). \(storageError.recoverySuggestion)")
             case .inProcess(let progress):
@@ -343,20 +343,25 @@ class CameraViewController : UIViewController, AVCaptureFileOutputRecordingDeleg
     }
     
     func downloadFile() {
-      let downloadToFileName = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask)[0].appendingPathComponent("output.txt")
-      Amplify.Storage.downloadFile(key: "output.txt", local: downloadToFileName) { (event) in
-          switch event {
-          case .completed:
-              print("Completed")
-              self.printFile(filePath: downloadToFileName.path)
-          case .failed:
-              print("failed")
-          case .inProcess:
-              print("searching for output")
-          default:
-              break
-          }
-      }
+        let downloadToFileName = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask)[0].appendingPathComponent("output.txt")
+        var stillPinging = true
+        repeat {
+            Amplify.Storage.downloadFile(key: "output.txt", local: downloadToFileName) { (event) in
+                switch event {
+                case .completed:
+                    print("Completed")
+                    stillPinging = false
+                    self.printFile(filePath: downloadToFileName.path)
+                case .failed:
+                    print("still Pinging")
+                case .inProcess:
+                    print("searching for output")
+                default:
+                    break
+                }
+            }
+            
+        } while (stillPinging)
     }
     
     func printFile(filePath: String){
