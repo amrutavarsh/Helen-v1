@@ -10,6 +10,10 @@ import SwiftUI
 import AVFoundation
 import Vision
 
+import Foundation
+import CoreServices
+import Photos
+
 import AWSS3
 import Amplify
 
@@ -35,14 +39,7 @@ struct CameraView : UIViewControllerRepresentable {
     
     func callSwitchCam() {controller.switchCamera()}
     func toggleStartStream() {
-        if controller.startStream == false{
-            controller.startRecording()
-            controller.startStream = true
-        }
-        else{
-            controller.stopRecording()
-            controller.startStream = false
-        }
+        controller.startRecording()
     }
     func faceFound()-> Bool{return controller.frameFaceFound}
     
@@ -257,7 +254,13 @@ class CameraViewController : UIViewController, AVCaptureFileOutputRecordingDeleg
             if (connection?.isVideoStabilizationSupported)! {
                 connection?.preferredVideoStabilizationMode = AVCaptureVideoStabilizationMode.auto
             }
+            
+            if movieOutput.availableVideoCodecTypes.contains(.h264) {
+                // Use the H.264 codec to encode the video.
+                movieOutput.setOutputSettings([AVVideoCodecKey: AVVideoCodecType.h264], for: connection!)
+            }
             outputURL = getURL()
+            try? FileManager.default.removeItem(at: outputURL)
             movieOutput.startRecording(to: outputURL, recordingDelegate: self)
         }
         else {
@@ -272,19 +275,30 @@ class CameraViewController : UIViewController, AVCaptureFileOutputRecordingDeleg
         }
         print("recording \(videoID) ended")
         let videoID = self.videoID
-        DispatchQueue.main.async {
-            self.uploadFile(fileNameKey : "HelenVideo\(videoID).mp4", filename : self.outputURL)
-            print("file uploaded")
-            self.downloadFile()
-        }
+//        DispatchQueue.main.async {
+//            self.uploadFile(fileNameKey : "HelenVideo\(videoID).mp4", filename : self.outputURL)
+//            print("file uploaded initiated")
+//            self.downloadFile()
+//        }
         self.videoID += 1
     }
     
     func fileOutput(_ output: AVCaptureFileOutput, didFinishRecordingTo outputFileURL: URL, from connections: [AVCaptureConnection], error: Error?) {
+//        PHPhotoLibrary.shared().performChanges({
+//            PHAssetChangeRequest.creationRequestForAssetFromVideo(atFileURL: self.outputURL)
+//        }) { saved, error in
+//            if saved {
+//                return
+//            }
+//        }
+        self.uploadFile(fileNameKey : "HelenVideo\(videoID).mp4", filename : self.outputURL)
+        print("file uploaded initiated")
+        self.downloadFile()
+        
     }
     
     func getURL() -> URL {
-        let path = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask)[0].appendingPathComponent("HelenVideo\(videoID).mp4")
+        let path = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask)[0].appendingPathComponent("HelenVideo\(videoID).mov")
         return path
     }
     
@@ -336,9 +350,8 @@ class CameraViewController : UIViewController, AVCaptureFileOutputRecordingDeleg
               print("Completed")
               self.printFile(filePath: downloadToFileName.path)
           case .failed:
-              self.downloadFile()
-              return
-          case .inProcess(let progress):
+              print("failed")
+          case .inProcess:
               print("searching for output")
           default:
               break
