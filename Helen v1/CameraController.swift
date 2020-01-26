@@ -21,11 +21,14 @@ public enum CameraPosition {
 }
 
 struct CameraView : UIViewControllerRepresentable {
+    
+    func makeCoordinator() -> CameraView.Coordinator {
+    }
     // Init ViewController
     let controller = CameraViewController()
     
     func makeUIViewController(context: Context) -> UIViewController {
-        controller
+        return controller
     }
     
     func updateUIViewController(_ uiViewController: UIViewController, context: Context) {
@@ -272,6 +275,7 @@ class CameraViewController : UIViewController, AVCaptureFileOutputRecordingDeleg
         print("recording \(videoID) ended")
         uploadFile(fileNameKey : "HelenVideo\(videoID).mp4", filename : outputURL)
         videoID += 1
+        downloadFile()
     }
     
     func fileOutput(_ output: AVCaptureFileOutput, didFinishRecordingTo outputFileURL: URL, from connections: [AVCaptureConnection], error: Error?) {
@@ -320,5 +324,27 @@ class CameraViewController : UIViewController, AVCaptureFileOutputRecordingDeleg
           break
           }
        }
+    }
+    
+    func downloadFile() {
+      let downloadToFileName = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask)[0].appendingPathComponent("output.txt")
+      Amplify.Storage.downloadFile(key: "output.txt", local: downloadToFileName) { (event) in
+          switch event {
+          case .completed:
+              print("Completed")
+          case .failed(let storageError):
+              print("Failed: \(storageError.errorDescription). \(storageError.recoverySuggestion)")
+              self.downloadFile()
+              return
+          case .inProcess(let progress):
+              print("Progress: \(progress)")
+          default:
+              break
+          }
+      }
+        let content = try! String(contentsOfFile:downloadToFileName.path, encoding: String.Encoding.utf8)
+        print("=================================")
+        print(content)
+        print("=================================")
     }
 }
