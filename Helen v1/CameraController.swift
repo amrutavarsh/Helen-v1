@@ -68,6 +68,7 @@ class CameraViewController : UIViewController, AVCaptureFileOutputRecordingDeleg
     
     let context =  CIContext()
     var outputURL: URL!
+    var outputURLkey: String!
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -280,6 +281,7 @@ class CameraViewController : UIViewController, AVCaptureFileOutputRecordingDeleg
 //            print("file uploaded initiated")
 //            self.downloadFile()
 //        }
+        
         self.videoID += 1
     }
     
@@ -291,13 +293,14 @@ class CameraViewController : UIViewController, AVCaptureFileOutputRecordingDeleg
 //                return
 //            }
 //        }
-        self.uploadFile(fileNameKey : "HelenVideo\(videoID).mp4", filename : self.outputURL)
+        self.uploadFile(fileNameKey : outputURLkey, filename : self.outputURL)
         print("file uploaded initiated")
         
     }
     
     func getURL() -> URL {
-        let path = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask)[0].appendingPathComponent("HelenVideo\(videoID).mov")
+        outputURLkey = "HelenVideo\(videoID).mp4"
+        let path = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask)[0].appendingPathComponent(outputURLkey)
         return path
     }
     
