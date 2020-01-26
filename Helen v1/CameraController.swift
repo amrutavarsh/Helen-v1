@@ -318,7 +318,6 @@ class CameraViewController : UIViewController, AVCaptureFileOutputRecordingDeleg
             switch event {
             case .completed(let data):
                 print("Completed: \(data)")
-                self.downloadFile()
             case .failed(let storageError):
                 print("Failed: \(storageError.errorDescription). \(storageError.recoverySuggestion)")
             case .inProcess(let progress):
@@ -335,6 +334,7 @@ class CameraViewController : UIViewController, AVCaptureFileOutputRecordingDeleg
       switch event {
       case .completed(let data):
           print("Completed: \(data)")
+          self.downloadFile()
       case .failed(let storageError):
           print("Failed: \(storageError.errorDescription). \(storageError.recoverySuggestion)")
       case .inProcess(let progress):
