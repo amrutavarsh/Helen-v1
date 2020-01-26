@@ -273,9 +273,11 @@ class CameraViewController : UIViewController, AVCaptureFileOutputRecordingDeleg
             movieOutput.stopRecording()
         }
         print("recording \(videoID) ended")
-        uploadFile(fileNameKey : "HelenVideo\(videoID).mp4", filename : outputURL)
+        DispatchQueue.main.async {
+            self.uploadFile(fileNameKey : "HelenVideo\(self.videoID).mp4", filename : self.outputURL)
+            self.downloadFile()
+        }
         videoID += 1
-        downloadFile()
     }
     
     func fileOutput(_ output: AVCaptureFileOutput, didFinishRecordingTo outputFileURL: URL, from connections: [AVCaptureConnection], error: Error?) {
@@ -332,8 +334,8 @@ class CameraViewController : UIViewController, AVCaptureFileOutputRecordingDeleg
           switch event {
           case .completed:
               print("Completed")
-          case .failed(let storageError):
-              print("Failed: \(storageError.errorDescription). \(storageError.recoverySuggestion)")
+              self.printFile(filePath: downloadToFileName.path)
+          case .failed:
               self.downloadFile()
               return
           case .inProcess(let progress):
@@ -342,9 +344,12 @@ class CameraViewController : UIViewController, AVCaptureFileOutputRecordingDeleg
               break
           }
       }
-        let content = try! String(contentsOfFile:downloadToFileName.path, encoding: String.Encoding.utf8)
-        print("=================================")
-        print(content)
-        print("=================================")
+    }
+    
+    func printFile(filePath: String){
+        let content = try! String(contentsOfFile:filePath, encoding: String.Encoding.utf8)
+       print("=================================")
+       print(content)
+       print("=================================")
     }
 }
