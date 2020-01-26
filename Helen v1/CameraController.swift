@@ -22,8 +22,6 @@ public enum CameraPosition {
 
 struct CameraView : UIViewControllerRepresentable {
     
-    func makeCoordinator() -> CameraView.Coordinator {
-    }
     // Init ViewController
     let controller = CameraViewController()
     
@@ -273,11 +271,13 @@ class CameraViewController : UIViewController, AVCaptureFileOutputRecordingDeleg
             movieOutput.stopRecording()
         }
         print("recording \(videoID) ended")
+        let videoID = self.videoID
         DispatchQueue.main.async {
-            self.uploadFile(fileNameKey : "HelenVideo\(self.videoID).mp4", filename : self.outputURL)
+            self.uploadFile(fileNameKey : "HelenVideo\(videoID).mp4", filename : self.outputURL)
+            print("file uploaded")
             self.downloadFile()
         }
-        videoID += 1
+        self.videoID += 1
     }
     
     func fileOutput(_ output: AVCaptureFileOutput, didFinishRecordingTo outputFileURL: URL, from connections: [AVCaptureConnection], error: Error?) {
@@ -321,7 +321,7 @@ class CameraViewController : UIViewController, AVCaptureFileOutputRecordingDeleg
       case .failed(let storageError):
           print("Failed: \(storageError.errorDescription). \(storageError.recoverySuggestion)")
       case .inProcess(let progress):
-          print("Progress: \(progress)")
+          print("publishing video")
       default:
           break
           }
@@ -339,7 +339,7 @@ class CameraViewController : UIViewController, AVCaptureFileOutputRecordingDeleg
               self.downloadFile()
               return
           case .inProcess(let progress):
-              print("Progress: \(progress)")
+              print("searching for output")
           default:
               break
           }

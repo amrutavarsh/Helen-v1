@@ -70,7 +70,7 @@ struct ContentView: View {
                         
                         RoundedRectangle(cornerRadius:30).opacity(0.7).frame(height: 250)
                         
-                        TextField(/*@START_MENU_TOKEN@*/"Placeholder"/*@END_MENU_TOKEN@*/, text: /*@START_MENU_TOKEN@*//*@PLACEHOLDER=Value@*/.constant("")/*@END_MENU_TOKEN@*/).frame(height: 160).padding()
+                        Text("PlaceHolder").frame(height: 160).padding()
                     }.offset(y:30).padding(.top, -30)
                 }
             }
