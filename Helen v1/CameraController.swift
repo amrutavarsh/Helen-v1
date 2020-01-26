@@ -104,8 +104,8 @@ class CameraViewController : UIViewController, AVCaptureFileOutputRecordingDeleg
             if camera.position == .front {
                 self.frontCamera = camera
                 try! camera.lockForConfiguration()
-                self.frontCamera!.activeVideoMaxFrameDuration = CMTimeMake(value: 1, timescale: Int32(30))
-                self.frontCamera!.activeVideoMinFrameDuration = CMTimeMake(value: 1, timescale: Int32(30))
+                self.frontCamera!.activeVideoMaxFrameDuration = CMTimeMake(value: 1, timescale: Int32(25))
+                self.frontCamera!.activeVideoMinFrameDuration = CMTimeMake(value: 1, timescale: Int32(25))
                 camera.unlockForConfiguration()
             }
             
@@ -114,8 +114,8 @@ class CameraViewController : UIViewController, AVCaptureFileOutputRecordingDeleg
                 
                 try! camera.lockForConfiguration()
                 camera.focusMode = .continuousAutoFocus
-                self.rearCamera!.activeVideoMaxFrameDuration = CMTimeMake(value: 1, timescale: Int32(30))
-                self.rearCamera!.activeVideoMinFrameDuration = CMTimeMake(value: 1, timescale: Int32(30))
+                self.rearCamera!.activeVideoMaxFrameDuration = CMTimeMake(value: 1, timescale: Int32(25))
+                self.rearCamera!.activeVideoMinFrameDuration = CMTimeMake(value: 1, timescale: Int32(25))
                 camera.unlockForConfiguration()
             }
         }
