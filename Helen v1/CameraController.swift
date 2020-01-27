@@ -333,7 +333,7 @@ class CameraViewController : UIViewController, AVCaptureFileOutputRecordingDeleg
       switch event {
       case .completed(let data):
           print("Completed: \(data)")
-          DispatchQueue.main.async{
+          DispatchQueue.main.asyncAfter(deadline: DispatchTime.now() + .seconds(1)){
             let downloadToFileName = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask)[0].appendingPathComponent("output.txt")
             try? FileManager.default.removeItem(at: downloadToFileName)
             self.downloadFile(downloadToFileName: downloadToFileName)}
