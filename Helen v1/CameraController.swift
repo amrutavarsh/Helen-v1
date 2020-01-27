@@ -334,7 +334,9 @@ class CameraViewController : UIViewController, AVCaptureFileOutputRecordingDeleg
       case .completed(let data):
           print("Completed: \(data)")
           DispatchQueue.main.async{
-            self.downloadFile()}
+            let downloadToFileName = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask)[0].appendingPathComponent("output.txt")
+            try? FileManager.default.removeItem(at: downloadToFileName)
+            self.downloadFile(downloadToFileName: downloadToFileName)}
       case .failed(let storageError):
           print("Failed: \(storageError.errorDescription). \(storageError.recoverySuggestion)")
       case .inProcess(let progress):
@@ -345,8 +347,7 @@ class CameraViewController : UIViewController, AVCaptureFileOutputRecordingDeleg
        }
     }
     
-    func downloadFile() {
-        let downloadToFileName = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask)[0].appendingPathComponent("output.txt")
+    func downloadFile(downloadToFileName: URL) {
         //var stillPinging = true
         Amplify.Storage.downloadFile(key: "output.txt", local: downloadToFileName) { (event) in
             switch event {
@@ -355,7 +356,7 @@ class CameraViewController : UIViewController, AVCaptureFileOutputRecordingDeleg
                 self.printFile(filePath: downloadToFileName.path)
             case .failed(let storageError):
                 print("searching")
-                self.downloadFile()
+                self.downloadFile(downloadToFileName: downloadToFileName)
             case .inProcess(let progress):
                 print("Progress: \(progress)")
             default:
@@ -390,5 +391,6 @@ class CameraViewController : UIViewController, AVCaptureFileOutputRecordingDeleg
        print("=================================")
        print(content)
        print("=================================")
+    
     }
 }
