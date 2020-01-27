@@ -17,7 +17,7 @@ struct ContentView: View {
     @State var listing = true
     @State var outputString = "..."
     @State var downloadComplete = false
-    let timer = Timer.publish(every: 1, on: .current, in: .common).autoconnect()
+    let timer = Timer.publish(every: 0.1, on: .current, in: .common).autoconnect()
     func recordButtonText(streamState: Bool) -> String {return (streamState ? "Stop" : "Start")}
     func recordButtonColor(streamState: Bool) -> Color {return (streamState ? Color.red : Color.blue)}
     func faceOpacity()->CGFloat{return (camView.faceFound() ? 0.0 :0.7)}
@@ -46,7 +46,7 @@ struct ContentView: View {
               print("Completed")
               listResult.items.forEach { (item) in
                   print("Key: \(item.key)")
-                  if (item.key == "output.txt"){
+                if (item.key == "output.txt" && self.downloadComplete == false){
                     DispatchQueue.main.asyncAfter(deadline: DispatchTime.now() + .seconds(1)){
                     try? FileManager.default.removeItem(at: FileManager.default.urls(for: .documentDirectory, in: .userDomainMask)[0].appendingPathComponent("output.txt"))
                         self.downloadFile()}
@@ -73,7 +73,7 @@ struct ContentView: View {
            print("=================================")
             print(content)
            print("=================================")
-           remove()
+            self.remove()
             downloadComplete = false
             return content
             }
