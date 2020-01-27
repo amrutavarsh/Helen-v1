@@ -17,7 +17,7 @@ import Photos
 import AWSS3
 import Amplify
 
-var useAudio:Bool = true
+var useAudio:Bool = false
 
 public enum CameraPosition {
     case front
@@ -333,10 +333,6 @@ class CameraViewController : UIViewController, AVCaptureFileOutputRecordingDeleg
       switch event {
       case .completed(let data):
           print("Completed: \(data)")
-          DispatchQueue.main.asyncAfter(deadline: DispatchTime.now() + .seconds(1)){
-            let downloadToFileName = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask)[0].appendingPathComponent("output.txt")
-            try? FileManager.default.removeItem(at: downloadToFileName)
-            self.downloadFile(downloadToFileName: downloadToFileName)}
       case .failed(let storageError):
           print("Failed: \(storageError.errorDescription). \(storageError.recoverySuggestion)")
       case .inProcess(let progress):
@@ -345,52 +341,5 @@ class CameraViewController : UIViewController, AVCaptureFileOutputRecordingDeleg
           break
           }
        }
-    }
-    
-    func downloadFile(downloadToFileName: URL) {
-        //var stillPinging = true
-        Amplify.Storage.downloadFile(key: "output.txt", local: downloadToFileName) { (event) in
-            switch event {
-            case .completed:
-                print("Completed")
-                self.printFile(filePath: downloadToFileName.path)
-            case .failed(let storageError):
-                print("searching")
-                self.downloadFile(downloadToFileName: downloadToFileName)
-            case .inProcess(let progress):
-                print("Progress: \(progress)")
-            default:
-                break
-            }
-        }
-    }
-    
-    func list() -> Bool {
-      var outputNotFound = true
-      Amplify.Storage.list { (event) in
-          switch event {
-          case .completed(let listResult):
-              print("Completed")
-              listResult.items.forEach { (item) in
-                  print("Key: \(item.key)")
-                  if item.key == "output.txt"{outputNotFound = false}
-              }
-          case .failed(let storageError):
-              print("Failed: \(storageError.errorDescription). \(storageError.recoverySuggestion)")
-          case .inProcess(let progress):
-              print("Progress: \(progress)")
-          default:
-              break
-          }
-      }
-      return outputNotFound
-    }
-    
-    func printFile(filePath: String){
-        let content = try! String(contentsOfFile:filePath, encoding: String.Encoding.utf8)
-       print("=================================")
-       print(content)
-       print("=================================")
-    
     }
 }
