@@ -295,7 +295,6 @@ class CameraViewController : UIViewController, AVCaptureFileOutputRecordingDeleg
 //        }
         self.uploadFile(fileNameKey : outputURLkey, filename : self.outputURL)
         print("file uploaded initiated")
-        
     }
     
     func getURL() -> URL {
@@ -334,7 +333,8 @@ class CameraViewController : UIViewController, AVCaptureFileOutputRecordingDeleg
       switch event {
       case .completed(let data):
           print("Completed: \(data)")
-          self.downloadFile()
+          DispatchQueue.main.async{
+            self.downloadFile()}
       case .failed(let storageError):
           print("Failed: \(storageError.errorDescription). \(storageError.recoverySuggestion)")
       case .inProcess(let progress):
@@ -347,24 +347,42 @@ class CameraViewController : UIViewController, AVCaptureFileOutputRecordingDeleg
     
     func downloadFile() {
         let downloadToFileName = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask)[0].appendingPathComponent("output.txt")
-        var stillPinging = true
-        repeat {
-            Amplify.Storage.downloadFile(key: "output.txt", local: downloadToFileName) { (event) in
-                switch event {
-                case .completed:
-                    print("Completed")
-                    stillPinging = false
-                    self.printFile(filePath: downloadToFileName.path)
-                case .failed:
-                    print("still Pinging")
-                case .inProcess:
-                    print("searching for output")
-                default:
-                    break
-                }
+        //var stillPinging = true
+        Amplify.Storage.downloadFile(key: "output.txt", local: downloadToFileName) { (event) in
+            switch event {
+            case .completed:
+                print("Completed")
+                self.printFile(filePath: downloadToFileName.path)
+            case .failed(let storageError):
+                print("searching")
+                self.downloadFile()
+            case .inProcess(let progress):
+                print("Progress: \(progress)")
+            default:
+                break
             }
-            
-        } while (stillPinging)
+        }
+    }
+    
+    func list() -> Bool {
+      var outputNotFound = true
+      Amplify.Storage.list { (event) in
+          switch event {
+          case .completed(let listResult):
+              print("Completed")
+              listResult.items.forEach { (item) in
+                  print("Key: \(item.key)")
+                  if item.key == "output.txt"{outputNotFound = false}
+              }
+          case .failed(let storageError):
+              print("Failed: \(storageError.errorDescription). \(storageError.recoverySuggestion)")
+          case .inProcess(let progress):
+              print("Progress: \(progress)")
+          default:
+              break
+          }
+      }
+      return outputNotFound
     }
     
     func printFile(filePath: String){
