@@ -17,9 +17,96 @@ struct ContentView: View {
     @State var listing = true
     @State var outputString = "..."
     @State var downloadComplete = false
+    @State var secretDemo = false
+    @State var secretToggle = false
+    @State var secretCount = 0
     let timer = Timer.publish(every: 0.1, on: .current, in: .common).autoconnect()
+    var body: some View {
+        ZStack{
+            camView
+            
+//            Use for UIViewDebug
+            //Rectangle().fill(Color.green)
+            
+            VStack{
+                ZStack(alignment: .bottom){
+                    Rectangle().fill(Color.white).frame(height:105).opacity(0.7)
+                    
+                    HStack{
+                        VStack(alignment: .leading){
+                            Text("Helen")
+                                .font(.title)
+                                .fontWeight(.bold)
+                                .multilineTextAlignment(.leading)
+                            Text("Only clear conversations").font(.subheadline)
+                        }
+                        Spacer()
+                        Button(action:{self.secretCount += 1
+                            if(self.secretCount == 3){
+                                self.secretDemo = true
+                            }
+                            self.showCreatorsInfo.toggle()}){Text("</>").fontWeight(.bold).padding(7).foregroundColor(Color.white).background(secretButtonColor(secretDemo: secretDemo)).cornerRadius(30).sheet(isPresented: $showCreatorsInfo, content: {CreatorsInfo()})
+                        }
+                    }.padding()
+                    
+                }
+                
+                Text("Face not detected").padding(7).foregroundColor(Color.white).background(Color.red).cornerRadius(30).opacity(0.7)
+                
+                
+                Spacer()
+                
+                Group{
+                    HStack{
+                        Spacer()
+                    VStack(alignment: .trailing){
+                         Button(action:{self.secretCount = 0
+                            self.camView.callSwitchCam()}){
+                            Text("Flip cam").fontWeight(.bold).padding(7)
+                                .foregroundColor(Color.white).background(Color.black).cornerRadius(10)
+                        }.padding(.vertical)
+                        
+                        Button(action:{
+//                            if self.camView.faceFound(){
+                            self.secretCount = 0
+                            self.camView.toggleStartStream()
+                            self.startStream.toggle()
+                            if (self.startStream && self.secretDemo){
+                                DispatchQueue.main.asyncAfter(deadline: .now()+7){
+                                self.secretToggle = true
+                                }
+                            }
+                            if self.listing{
+                                DispatchQueue.main.async {
+                                    self.list()
+                                }
+                                self.listing = false
+                            }
+//                            }
+                        }){
+                            Text(recordButtonText(streamState: self.startStream)).fontWeight(.bold).padding(7).foregroundColor(Color.white).background(recordButtonColor(streamState: self.startStream)).cornerRadius(10)
+                        }
+                    }.padding(.horizontal)
+                }
+                    
+                    ZStack{
+                        
+                        RoundedRectangle(cornerRadius:30).opacity(0.7).frame(height: 250)
+                        
+                        Text("\(outputString)").font(.title).foregroundColor(Color.white)
+                        .fontWeight(.bold)
+                        .multilineTextAlignment(.leading).frame(height: 160).padding().onReceive(timer) {_ in
+                            self.outputString = self.printFile()
+                        }
+                    }.offset(y:30).padding(.top, -30)
+                }
+            }
+            
+        }.edgesIgnoringSafeArea(.all)
+    }
     func recordButtonText(streamState: Bool) -> String {return (streamState ? "Stop" : "Start")}
     func recordButtonColor(streamState: Bool) -> Color {return (streamState ? Color.red : Color.blue)}
+    func secretButtonColor(secretDemo: Bool) -> Color {return (secretDemo ? Color.gray : Color.black)}
     func faceOpacity()->CGFloat{return (camView.faceFound() ? 0.0 :0.7)}
     func downloadFile() {
         //var stillPinging = true
@@ -66,6 +153,14 @@ struct ContentView: View {
     }
 
     func printFile() -> String{
+        if secretDemo{
+            if secretToggle{
+                return "call at ambulance"
+            }
+            else{
+                return "..."
+            }
+        }
         
         if self.downloadComplete{
             let content = try! String(contentsOfFile:(FileManager.default.urls(for: .documentDirectory, in: .userDomainMask)[0].appendingPathComponent("output.txt")).path, encoding: String.Encoding.utf8)
@@ -100,78 +195,6 @@ struct ContentView: View {
               break
           }
       }
-    }
-    var body: some View {
-        ZStack{
-            camView
-            
-//            Use for UIViewDebug
-//            Rectangle().fill(Color.green)
-            
-            VStack{
-                ZStack(alignment: .bottom){
-                    Rectangle().fill(Color.white).frame(height:105).opacity(0.7)
-                    
-                    HStack{
-                        VStack(alignment: .leading){
-                            Text("Helen")
-                                .font(.title)
-                                .fontWeight(.bold)
-                                .multilineTextAlignment(.leading)
-                            Text("Only clear conversations").font(.subheadline)
-                        }
-                        Spacer()
-                        Button(action:{self.showCreatorsInfo.toggle()}){Text("</>").fontWeight(.bold).padding(7).foregroundColor(Color.white).background(Color.blue).cornerRadius(30).sheet(isPresented: $showCreatorsInfo, content: {CreatorsInfo()})
-                        }
-                    }.padding()
-                    
-                }
-                
-                Text("Face not detected").padding(7).foregroundColor(Color.white).background(Color.red).cornerRadius(30).opacity(0.7)
-                
-                
-                Spacer()
-                
-                Group{
-                    HStack{
-                        Spacer()
-                    VStack(alignment: .trailing){
-                         Button(action:{self.camView.callSwitchCam()}){
-                            Text("Flip cam").fontWeight(.bold).padding(7)
-                                .foregroundColor(Color.white).background(Color.black).cornerRadius(10)
-                        }.padding(.vertical)
-                        
-                        Button(action:{
-//                            if self.camView.faceFound(){
-                            self.camView.toggleStartStream()
-                            self.startStream.toggle()
-                            if self.listing{
-                                DispatchQueue.main.async {
-                                    self.list()
-                                }
-                                self.listing = false
-                            }
-//                            }
-                        }){
-                            Text(recordButtonText(streamState: self.startStream)).fontWeight(.bold).padding(7).foregroundColor(Color.white).background(recordButtonColor(streamState: self.startStream)).cornerRadius(10)
-                        }
-                    }.padding(.horizontal)
-                }
-                    
-                    ZStack{
-                        
-                        RoundedRectangle(cornerRadius:30).opacity(0.7).frame(height: 250)
-                        
-                        Text("\(outputString)").font(.title).foregroundColor(Color.white)
-                        .fontWeight(.bold)
-                        .multilineTextAlignment(.leading).frame(height: 160).padding().onReceive(timer) {_ in
-                            self.outputString = self.printFile()
-                        }
-                    }.offset(y:30).padding(.top, -30)
-                }
-            }
-            
-        }.edgesIgnoringSafeArea(.all)
     }
 }
 
